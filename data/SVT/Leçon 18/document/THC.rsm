@@ -1,0 +1,147 @@
+HEADER    PROTEIN                                 03-SEP-13   NONE
+TITLE     NULL                                                        
+COMPND    NULL                                                        
+SOURCE    NULL                                                        
+KEYWDS    NULL                                                        
+EXPDTA    NULL                                                        
+AUTHOR    Marvin                                                      
+REVDAT   1   03-SEP-13         0                                  
+HETATM    1  C   UNK     0      14.365 -10.852   0.000  0.00  0.00           C+0
+HETATM    2  C   UNK     0      15.688 -11.619   0.000  0.00  0.00           C+0
+HETATM    3  C   UNK     0      13.029 -11.619   0.000  0.00  0.00           C+0
+HETATM    4  C   UNK     0      14.371  -9.319   0.000  0.00  0.00           C+0
+HETATM    5  C   UNK     0      15.688 -13.164   0.000  0.00  0.00           C+0
+HETATM    6  C   UNK     0      17.024 -10.852   0.000  0.00  0.00           C+0
+HETATM    7  C   UNK     0      13.029 -13.164   0.000  0.00  0.00           C+0
+HETATM    8  C   UNK     0      11.699 -10.846   0.000  0.00  0.00           C+0
+HETATM    9  C   UNK     0      13.035  -8.547   0.000  0.00  0.00           C+0
+HETATM   10  O   UNK     0      14.365 -13.930   0.000  0.00  0.00           O+0
+HETATM   11  C   UNK     0      17.024 -13.930   0.000  0.00  0.00           C+0
+HETATM   12  C   UNK     0      18.347 -11.619   0.000  0.00  0.00           C+0
+HETATM   13  O   UNK     0      17.024  -9.313   0.000  0.00  0.00           O+0
+HETATM   14  C   UNK     0      11.699  -9.313   0.000  0.00  0.00           C+0
+HETATM   15  C   UNK     0      13.042  -7.014   0.000  0.00  0.00           C+0
+HETATM   16  C   UNK     0      18.347 -13.164   0.000  0.00  0.00           C+0
+HETATM   17  C   UNK     0      19.677 -13.930   0.000  0.00  0.00           C+0
+HETATM   18  C   UNK     0      21.013 -13.158   0.000  0.00  0.00           C+0
+HETATM   19  C   UNK     0      22.336 -13.924   0.000  0.00  0.00           C+0
+HETATM   20  C   UNK     0      23.672 -13.158   0.000  0.00  0.00           C+0
+HETATM   21  C   UNK     0      24.995 -13.924   0.000  0.00  0.00           C+0
+HETATM   22  H   UNK     0      15.616 -10.066   0.000  0.00  0.00           H+0
+HETATM   23  H   UNK     0      11.496 -12.634   0.000  0.00  0.00           H+0
+HETATM   24  C   UNK     0      13.029 -14.704   0.000  0.00  0.00           C+0
+HETATM   25  C   UNK     0      11.695 -13.934   0.000  0.00  0.00           C+0
+CONECT    1    2    3    4   22                                             
+CONECT    2    1    5    6                                                  
+CONECT    3    1    7    8   23                                             
+CONECT    4    1    9                                                       
+CONECT    5    2   10   11                                                  
+CONECT    6    2   12   13                                                  
+CONECT    7    3   10   24   25                                             
+CONECT    8    3   14                                                       
+CONECT    9    4   15   14                                                  
+CONECT   10    5    7                                                       
+CONECT   11    5   16                                                       
+CONECT   12    6   16                                                       
+CONECT   13    6                                                            
+CONECT   14    8    9                                                       
+CONECT   15    9                                                            
+CONECT   16   11   17   12                                                  
+CONECT   17   16   18                                                       
+CONECT   18   17   19                                                       
+CONECT   19   18   20                                                       
+CONECT   20   19   21                                                       
+CONECT   21   20                                                            
+CONECT   22    1                                                            
+CONECT   23    3                                                            
+CONECT   24    7                                                            
+CONECT   25    7                                                            
+MASTER        0    0    0    0    0    0    0    0   25    0   54    0
+END
+
+#!rasmol -rsm file
+# Creator: RasTop Version 2.0.3 - Copyright (C) Philippe Valadon 2000-2003
+
+zap
+set connect on
+load pdb inline
+set title NONE
+
+# Colour details
+background [0,0,0]
+set backfade off
+set headlight default
+set ambient 40
+set specular off
+set shadepower 50
+set depthcue off
+set shadow off
+stereo off
+
+# Transformation
+reset
+rotate molecule
+set picking ident
+set worlddepth 5206
+# zoom 100.00
+scale 20.82
+position x 0.000 y 0.000 z 0.000
+slab off
+depth off
+
+# Rendering
+set axes off
+set boundingbox off
+set unitcell off
+set bonds off
+set bondmode and
+dots off
+
+# Avoid Colour Problems!
+select all
+colour bonds none
+colour backbone none
+colour hbonds none
+colour ssbonds none
+colour ribbons none
+colour white
+
+# Atoms
+colour atoms cpk
+spacefill off
+
+# Bonds
+wireframe on
+
+# Ribbons
+ribbons off
+
+# Backbone
+backbone off
+
+# Labels
+labels off
+
+# Monitors
+monitors off
+
+# ssbonds
+ssbonds off
+
+# hbonds
+hbonds off
+
+# Dots
+set solvent false
+set radius 0
+set dots 1
+dots off
+
+# AtomSets
+# no sets
+
+select all
+
+rotate world
+
+exit

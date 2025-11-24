@@ -1,0 +1,7 @@
+torch  --index-url https://download.pytorch.org/whl/cu130
+torchvision --index-url https://download.pytorch.org/whl/cu130
+llama-index 
+chromadb
+langchain-community
+pymupdf
+streamlit

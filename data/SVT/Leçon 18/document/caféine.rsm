@@ -1,0 +1,130 @@
+HEADER    PROTEIN                                 23-FEB-12   NONE
+TITLE     NULL                                                        
+COMPND    MOLECULE: 201                                               
+SOURCE    NULL                                                        
+KEYWDS    NULL                                                        
+EXPDTA    NULL                                                        
+AUTHOR    Marvin                                                      
+REVDAT   1   23-FEB-12         0                                  
+HETATM    1  O   UNK     0       5.748   3.080   0.000  0.00  0.00           O+0
+HETATM    2  O   UNK     0       3.080  -1.540   0.000  0.00  0.00           O+0
+HETATM    3  N   UNK     0       5.748  -1.540   0.000  0.00  0.00           N+0
+HETATM    4  N   UNK     0       8.538   1.239   0.000  0.00  0.00           N+0
+HETATM    5  N   UNK     0       4.414   0.770   0.000  0.00  0.00           N+0
+HETATM    6  N   UNK     0       8.538  -1.239   0.000  0.00  0.00           N+0
+HETATM    7  C   UNK     0       7.081   0.770   0.000  0.00  0.00           C+0
+HETATM    8  C   UNK     0       7.081  -0.770   0.000  0.00  0.00           C+0
+HETATM    9  C   UNK     0       5.748   1.540   0.000  0.00  0.00           C+0
+HETATM   10  C   UNK     0       4.414  -0.770   0.000  0.00  0.00           C+0
+HETATM   11  C   UNK     0       9.437   0.000   0.000  0.00  0.00           C+0
+HETATM   12  C   UNK     0       5.748  -3.080   0.000  0.00  0.00           C+0
+HETATM   13  C   UNK     0       9.017   2.703   0.000  0.00  0.00           C+0
+HETATM   14  C   UNK     0       3.080   1.540   0.000  0.00  0.00           C+0
+CONECT    1    9                                                            
+CONECT    2   10                                                            
+CONECT    3    8   10   12                                                  
+CONECT    4    7   11   13                                                  
+CONECT    5    9   10   14                                                  
+CONECT    6    8   11                                                       
+CONECT    7    4    8    9                                                  
+CONECT    8    3    6    7                                                  
+CONECT    9    1    5    7                                                  
+CONECT   10    2    3    5                                                  
+CONECT   11    4    6                                                       
+CONECT   12    3                                                            
+CONECT   13    4                                                            
+CONECT   14    5                                                            
+MASTER        0    0    0    0    0    0    0    0   14    0   30    0
+END
+
+#!rasmol -rsm file
+# Creator: RasTop Version 2.0.3 - Copyright (C) Philippe Valadon 2000-2003
+
+zap
+set connect on
+load pdb inline
+set title NONE
+
+# Colour details
+background [0,0,0]
+set backfade off
+set headlight default
+set ambient 40
+set specular off
+set shadepower 50
+set depthcue off
+set shadow off
+stereo off
+
+# Transformation
+reset
+rotate molecule
+set picking ident
+set worlddepth 3430
+# zoom 100.00
+scale 13.72
+position x 0.000 y 0.000 z 0.000
+slab off
+depth off
+
+# Rendering
+set axes off
+set boundingbox off
+set unitcell off
+set bonds off
+set bondmode and
+dots off
+
+# Avoid Colour Problems!
+select all
+colour bonds none
+colour backbone none
+colour hbonds none
+colour ssbonds none
+colour ribbons none
+colour white
+
+# Atoms
+select (atomno>=1) and (atomno<=6)
+colour atoms cpk
+select (atomno>=7) and (atomno<=14)
+colour atoms [255,255,255]
+select all
+spacefill 120
+set shadow off
+
+# Bonds
+wireframe 40
+
+# Ribbons
+ribbons off
+
+# Backbone
+backbone off
+
+# Labels
+labels off
+
+# Monitors
+monitors off
+
+# ssbonds
+ssbonds off
+
+# hbonds
+hbonds off
+
+# Dots
+set solvent false
+set radius 0
+set dots 1
+dots off
+
+# AtomSets
+# no sets
+
+select all
+
+rotate world
+
+exit

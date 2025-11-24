@@ -1,0 +1,107 @@
+HEADER    PROTEIN                                 23-FEB-12   NONE
+TITLE     NULL                                                        
+COMPND    NULL                                                        
+SOURCE    NULL                                                        
+KEYWDS    NULL                                                        
+EXPDTA    NULL                                                        
+AUTHOR    Marvin                                                      
+REVDAT   1   23-FEB-12         0                                  
+HETATM    1  O   UNK     0       3.907  -0.385   0.000  0.00  0.00           O+0
+HETATM    2  C   UNK     0       5.241   0.385   0.000  0.00  0.00           C+0
+HETATM    3  C   UNK     0       6.574  -0.385   0.000  0.00  0.00           C+0
+CONECT    1    2                                                            
+CONECT    2    1    3                                                       
+CONECT    3    2                                                            
+MASTER        0    0    0    0    0    0    0    0    3    0    4    0
+END
+
+#!rasmol -rsm file
+# Creator: RasTop Version 2.0.3 - Copyright (C) Philippe Valadon 2000-2003
+
+zap
+set connect on
+load pdb inline
+set title NONE
+
+# Colour details
+background [0,0,0]
+set backfade off
+set headlight default
+set ambient 40
+set specular off
+set shadepower 50
+set depthcue off
+set shadow off
+stereo off
+
+# Transformation
+reset
+rotate molecule
+set picking ident
+set worlddepth 2194
+# zoom 100.00
+scale 8.78
+position x 0.000 y 0.000 z 0.000
+slab off
+depth off
+
+# Rendering
+set axes off
+set boundingbox off
+set unitcell off
+set bonds off
+set bondmode and
+dots off
+
+# Avoid Colour Problems!
+select all
+colour bonds none
+colour backbone none
+colour hbonds none
+colour ssbonds none
+colour ribbons none
+colour white
+
+# Atoms
+select atomno=1
+colour atoms [240,0,0]
+select (atomno>=2) and (atomno<=3)
+colour atoms [255,255,255]
+select all
+spacefill off
+
+# Bonds
+wireframe on
+
+# Ribbons
+ribbons off
+
+# Backbone
+backbone off
+
+# Labels
+labels off
+
+# Monitors
+monitors off
+
+# ssbonds
+ssbonds off
+
+# hbonds
+hbonds off
+
+# Dots
+set solvent false
+set radius 0
+set dots 1
+dots off
+
+# AtomSets
+# no sets
+
+select all
+
+rotate world
+
+exit

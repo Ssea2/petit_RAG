@@ -1,0 +1,209 @@
+HEADER    PROTEIN                                 20-NOV-17   NONE
+TITLE     NULL                                                        
+COMPND    NULL                                                        
+SOURCE    NULL                                                        
+KEYWDS    NULL                                                        
+EXPDTA    NULL                                                        
+AUTHOR    Marvin                                                      
+REVDAT   1   20-NOV-17         0                                  
+HETATM    1  S   UNK     0      -4.733   4.238   0.000  0.00  0.00           S+0
+HETATM    2  S   UNK     0      -4.733   2.698   0.000  0.00  0.00           S+0
+HETATM    3  C   UNK     0      -2.065   2.698   0.000  0.00  0.00           C+0
+HETATM    4  C   UNK     0      -2.065   4.238   0.000  0.00  0.00           C+0
+HETATM    5  C   UNK     0      -3.399   5.008   0.000  0.00  0.00           C+0
+HETATM    6  C   UNK     0      -6.066   0.388   0.000  0.00  0.00           C+0
+HETATM    7  N   UNK     0      -4.733  -0.536   0.000  0.00  0.00           N+0
+HETATM    8  C   UNK     0      -2.065  -0.382   0.000  0.00  0.00           C+0
+HETATM    9  C   UNK     0      -0.731   0.388   0.000  0.00  0.00           C+0
+HETATM   10  N   UNK     0      -0.731   1.928   0.000  0.00  0.00           N+0
+HETATM   11  C   UNK     0      -4.733  -1.922   0.000  0.00  0.00           C+0
+HETATM   12  C   UNK     0      -3.399  -2.692   0.000  0.00  0.00           C+0
+HETATM   13  N   UNK     0      -2.065  -1.922   0.000  0.00  0.00           N+0
+HETATM   14  O   UNK     0      -3.378   0.376   0.000  0.00  0.00           O+0
+HETATM   15  O   UNK     0      -3.378   1.939   0.000  0.00  0.00           O+0
+HETATM   16  N   UNK     0      -0.704   5.008   0.000  0.00  0.00           N+0
+HETATM   17  C   UNK     0       0.630   4.238   0.000  0.00  0.00           C+0
+HETATM   18  C   UNK     0       1.963   5.008   0.000  0.00  0.00           C+0
+HETATM   19  C   UNK     0       3.297   4.238   0.000  0.00  0.00           C+0
+HETATM   20  C   UNK     0       4.631   5.008   0.000  0.00  0.00           C+0
+HETATM   21  C   UNK     0       5.987   4.224   0.000  0.00  0.00           C+0
+HETATM   22  C   UNK     0       7.321   4.994   0.000  0.00  0.00           C+0
+HETATM   23  C   UNK     0       7.321   6.534   0.000  0.00  0.00           C+0
+HETATM   24  C   UNK     0       5.965   7.318   0.000  0.00  0.00           C+0
+HETATM   25  C   UNK     0       4.631   6.548   0.000  0.00  0.00           C+0
+HETATM   26  N   UNK     0       1.963   6.548   0.000  0.00  0.00           N+0
+HETATM   27  O   UNK     0       0.630   2.929   0.000  0.00  0.00           O+0
+HETATM   28  C   UNK     0      -2.629   6.341   0.000  0.00  0.00           C+0
+HETATM   29  C   UNK     0      -4.169   6.341   0.000  0.00  0.00           C+0
+HETATM   30  C   UNK     0      -7.381  -0.371   0.000  0.00  0.00           C+0
+HETATM   31  O   UNK     0      -8.687   0.382   0.000  0.00  0.00           O+0
+HETATM   32  O   UNK     0      -7.381  -1.922   0.000  0.00  0.00           O+0
+HETATM   33  O   UNK     0      -6.066  -2.692   0.000  0.00  0.00           O+0
+HETATM   34  O   UNK     0       8.687   7.323   0.000  0.00  0.00           O+0
+HETATM   35  C   UNK     0      -3.399  -4.232   0.000  0.00  0.00           C+0
+HETATM   36  C   UNK     0      -4.751  -5.013   0.000  0.00  0.00           C+0
+HETATM   37  C   UNK     0      -6.075  -4.248   0.000  0.00  0.00           C+0
+HETATM   38  C   UNK     0      -7.409  -5.018   0.000  0.00  0.00           C+0
+HETATM   39  C   UNK     0      -7.409  -6.558   0.000  0.00  0.00           C+0
+HETATM   40  C   UNK     0      -6.085  -7.323   0.000  0.00  0.00           C+0
+HETATM   41  C   UNK     0      -4.751  -6.553   0.000  0.00  0.00           C+0
+HETATM   42  C   UNK     0      -6.836   3.261   0.000  0.00  0.00           C+0
+HETATM   43  C   UNK     0      -7.606   1.928   0.000  0.00  0.00           C+0
+HETATM   44  C   UNK     0      -6.066   1.928   0.000  0.00  0.00           C+0
+CONECT    1    2    5                                                       
+CONECT    2    1   44                                                       
+CONECT    3    4   10   15                                                  
+CONECT    4    3    5   16                                                  
+CONECT    5    4    1   28   29                                             
+CONECT    6   44    7   30                                                  
+CONECT    7    6   11                                                       
+CONECT    8    9   13   14                                                  
+CONECT    9    8   10                                                       
+CONECT   10    9    3                                                       
+CONECT   11    7   12   33                                                  
+CONECT   12   11   13   35                                                  
+CONECT   13   12    8                                                       
+CONECT   14    8                                                            
+CONECT   15    3                                                            
+CONECT   16    4   17                                                       
+CONECT   17   16   18   27                                                  
+CONECT   18   17   19   26                                                  
+CONECT   19   18   20                                                       
+CONECT   20   19   21   25                                                  
+CONECT   21   20   22                                                       
+CONECT   22   21   23                                                       
+CONECT   23   22   24   34                                                  
+CONECT   24   23   25                                                       
+CONECT   25   24   20                                                       
+CONECT   26   18                                                            
+CONECT   27   17                                                            
+CONECT   28    5                                                            
+CONECT   29    5                                                            
+CONECT   30    6   31   32                                                  
+CONECT   31   30                                                            
+CONECT   32   30                                                            
+CONECT   33   11                                                            
+CONECT   34   23                                                            
+CONECT   35   12   36                                                       
+CONECT   36   35   37   41                                                  
+CONECT   37   36   38                                                       
+CONECT   38   37   39                                                       
+CONECT   39   38   40                                                       
+CONECT   40   39   41                                                       
+CONECT   41   40   36                                                       
+CONECT   42   44                                                            
+CONECT   43   44                                                            
+CONECT   44    2    6   43   42                                             
+MASTER        0    0    0    0    0    0    0    0   44    0   92    0
+END
+
+#!rasmol -rsm file
+# Creator: RasTop Version 2.0.3 - Copyright (C) Philippe Valadon 2000-2003
+
+zap
+set connect on
+load pdb inline
+set title NONE
+
+# Colour details
+background [0,0,0]
+set backfade off
+set headlight default
+set ambient 40
+set specular off
+set shadepower 50
+set depthcue off
+set shadow off
+stereo off
+
+# Transformation
+reset
+rotate molecule
+set picking ident
+set worlddepth 7178
+# zoom 100.00
+scale 28.71
+position x 0.000 y 0.000 z 0.000
+slab off
+depth off
+
+# Rendering
+set axes off
+set boundingbox off
+set unitcell off
+set bonds off
+set bondmode and
+dots off
+
+# Avoid Colour Problems!
+select all
+colour bonds none
+colour backbone none
+colour hbonds none
+colour ssbonds none
+colour ribbons none
+colour white
+
+# Atoms
+select (atomno>=1) and (atomno<=2)
+colour atoms [255,200,50]
+select (atomno>=3) and (atomno<=6)
+colour atoms [255,255,255]
+select atomno=7
+colour atoms [143,143,255]
+select (atomno>=8) and (atomno<=9)
+colour atoms [255,255,255]
+select atomno=10
+colour atoms [143,143,255]
+select (atomno>=11) and (atomno<=12)
+colour atoms [255,255,255]
+select (atomno>=13) and (atomno<=16)
+colour atoms cpk
+select (atomno>=17) and (atomno<=25)
+colour atoms [255,255,255]
+select (atomno>=26) and (atomno<=27)
+colour atoms cpk
+select (atomno>=28) and (atomno<=30)
+colour atoms [255,255,255]
+select (atomno>=31) and (atomno<=34)
+colour atoms [240,0,0]
+select (atomno>=35) and (atomno<=44)
+colour atoms [255,255,255]
+select all
+spacefill off
+
+# Bonds
+wireframe on
+
+# Ribbons
+ribbons off
+
+# Backbone
+backbone off
+
+# Labels
+labels off
+
+# Monitors
+monitors off
+
+# ssbonds
+ssbonds off
+
+# hbonds
+hbonds off
+
+# Dots
+set solvent false
+set radius 0
+set dots 1
+dots off
+
+# AtomSets
+# no sets
+
+select all
+
+rotate world
+
+exit

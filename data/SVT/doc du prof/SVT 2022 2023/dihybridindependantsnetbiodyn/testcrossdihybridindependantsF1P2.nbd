@@ -1,0 +1,295 @@
+version:3d-1.0
+class netbiodyn.ProtoReaxel
+	Etiquettes:P2[VgEb]
+	Manipules:
+	Relais:
+	X:0
+	Y:0
+	visibleDansPanel:true
+	couleur:-3862731
+	demie_vie:0.0
+	vidable:true
+	forme:1
+	taille:0
+	tailleFenetre:100
+	mobilite_rotation:0.0
+	mobilite_translation_x:0.5
+	mobilite_translation_y:0.5
+	mobilite_translation_z:0.5
+	nbPosAngulaires:1
+	pseudoAffinite:0;0;0;0;0;0;0;0
+	pseudoCharge:0;0;0;0;0;0;0;0;0
+	visibleDansPanel:true
+	Image:vgeb.PNG
+Fin
+
+class netbiodyn.ProtoReaxel
+	Etiquettes:F1[Vg+Eb+]
+	Manipules:
+	Relais:
+	X:0
+	Y:0
+	visibleDansPanel:true
+	couleur:-10950978
+	demie_vie:0.0
+	vidable:true
+	forme:1
+	taille:0
+	tailleFenetre:100
+	mobilite_rotation:0.0
+	mobilite_translation_x:0.5
+	mobilite_translation_y:0.5
+	mobilite_translation_z:0.5
+	nbPosAngulaires:1
+	pseudoAffinite:0;0;0;0;0;0;0;0
+	pseudoCharge:0;0;0;0;0;0;0;0;0
+	visibleDansPanel:true
+	Image:vg+eb+.PNG
+Fin
+
+class netbiodyn.ProtoReaxel
+	Etiquettes:F2[VgEb]
+	Manipules:
+	Relais:
+	X:0
+	Y:0
+	visibleDansPanel:true
+	couleur:-2064397
+	demie_vie:0.0
+	vidable:true
+	forme:1
+	taille:0
+	tailleFenetre:100
+	mobilite_rotation:0.0
+	mobilite_translation_x:0.5
+	mobilite_translation_y:0.5
+	mobilite_translation_z:0.5
+	nbPosAngulaires:1
+	pseudoAffinite:0;0;0;0;0;0;0;0
+	pseudoCharge:0;0;0;0;0;0;0;0;0
+	visibleDansPanel:true
+	Image:vgeb.PNG
+Fin
+
+class netbiodyn.ProtoReaxel
+	Etiquettes:F2[Vg+Eb]
+	Manipules:
+	Relais:
+	X:0
+	Y:0
+	visibleDansPanel:true
+	couleur:-9517539
+	demie_vie:0.0
+	vidable:true
+	forme:1
+	taille:0
+	tailleFenetre:100
+	mobilite_rotation:0.0
+	mobilite_translation_x:0.5
+	mobilite_translation_y:0.5
+	mobilite_translation_z:0.5
+	nbPosAngulaires:1
+	pseudoAffinite:0;0;0;0;0;0;0;0
+	pseudoCharge:0;0;0;0;0;0;0;0;0
+	visibleDansPanel:true
+	Image:vg+eb.PNG
+Fin
+
+class netbiodyn.ProtoReaxel
+	Etiquettes:F2[VgEb+]
+	Manipules:
+	Relais:
+	X:0
+	Y:0
+	visibleDansPanel:true
+	couleur:-3862731
+	demie_vie:0.0
+	vidable:true
+	forme:1
+	taille:0
+	tailleFenetre:100
+	mobilite_rotation:0.0
+	mobilite_translation_x:0.5
+	mobilite_translation_y:0.5
+	mobilite_translation_z:0.5
+	nbPosAngulaires:1
+	pseudoAffinite:0;0;0;0;0;0;0;0
+	pseudoCharge:0;0;0;0;0;0;0;0;0
+	visibleDansPanel:true
+	Image:vgeb+.PNG
+Fin
+
+class netbiodyn.ProtoReaxel
+	Etiquettes:F2[Vg+Eb+]
+	Manipules:
+	Relais:
+	X:0
+	Y:0
+	visibleDansPanel:true
+	couleur:-454922
+	demie_vie:0.0
+	vidable:true
+	forme:1
+	taille:0
+	tailleFenetre:100
+	mobilite_rotation:0.0
+	mobilite_translation_x:0.5
+	mobilite_translation_y:0.5
+	mobilite_translation_z:0.5
+	nbPosAngulaires:1
+	pseudoAffinite:0;0;0;0;0;0;0;0
+	pseudoCharge:0;0;0;0;0;0;0;0;0
+	visibleDansPanel:true
+	Image:vg+eb+.PNG
+Fin
+
+class netbiodyn.MoteurReaction
+	Etiquettes:testcross1
+	Manipules:
+	Relais:
+	X:0
+	Y:550
+	visibleDansPanel:true
+	Description:
+	reactif:P2[VgEb]
+	reactif:F1[Vg+Eb+]
+	reactif:0
+	produit:P2[VgEb]
+	produit:F1[Vg+Eb+]
+	produit:F2[VgEb]
+	k:0.25
+	type:0
+	pos:122222222
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+Fin
+
+class netbiodyn.MoteurReaction
+	Etiquettes:testcross2
+	Manipules:
+	Relais:
+	X:0
+	Y:0
+	visibleDansPanel:true
+	Description:
+	reactif:P2[VgEb]
+	reactif:F1[Vg+Eb+]
+	reactif:0
+	produit:P2[VgEb]
+	produit:F1[Vg+Eb+]
+	produit:F2[Vg+Eb]
+	k:0.25
+	type:0
+	pos:122222222
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+Fin
+
+class netbiodyn.MoteurReaction
+	Etiquettes:testcross3
+	Manipules:
+	Relais:
+	X:0
+	Y:0
+	visibleDansPanel:true
+	Description:
+	reactif:P2[VgEb]
+	reactif:F1[Vg+Eb+]
+	reactif:0
+	produit:P2[VgEb]
+	produit:F1[Vg+Eb+]
+	produit:F2[VgEb+]
+	k:0.25
+	type:0
+	pos:122222222
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+Fin
+
+class netbiodyn.MoteurReaction
+	Etiquettes:testcross4
+	Manipules:
+	Relais:
+	X:0
+	Y:0
+	visibleDansPanel:true
+	Description:
+	reactif:P2[VgEb]
+	reactif:F1[Vg+Eb+]
+	reactif:0
+	produit:P2[VgEb]
+	produit:F1[Vg+Eb+]
+	produit:F2[Vg+Eb+]
+	k:0.25
+	type:0
+	pos:122222222
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+	pos:212101210
+Fin
+
+class netbiodyn.MoteurInfluenceCharges
+	Etiquettes:AUTO_ionette
+	Manipules:
+	Relais:
+	X:0
+	Y:0
+	visibleDansPanel:true
+Fin
+
+class netbiodyn.MoteurInfluenceAdhesion
+	Etiquettes:AUTO_affome
+	Manipules:
+	Relais:
+	X:0
+	Y:0
+	visibleDansPanel:true
+Fin
+
+class netbiodyn.MoteurInfluenceLiens
+	Etiquettes:AUTO_liens
+	Manipules:
+	Relais:
+	X:0
+	Y:0
+	visibleDansPanel:true
+Fin
+
+biodyn_net.Environnement
+	tailleX:100
+	tailleY:100
+	tailleZ:2
+Fin
+
+Reaxels
+Fin
+
+Connexels
+Fin
+
+Complexels:
+Fin
+

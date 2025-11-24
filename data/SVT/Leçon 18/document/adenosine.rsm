@@ -1,0 +1,139 @@
+HEADER    PROTEIN                                 24-OCT-17   NONE
+TITLE     NULL                                                        
+COMPND    MOLECULE: 640                                               
+SOURCE    NULL                                                        
+KEYWDS    NULL                                                        
+EXPDTA    NULL                                                        
+AUTHOR    Marvin                                                      
+REVDAT   1   24-OCT-17         0                                  
+HETATM    1  O   UNK     0       9.149   1.271   0.000  0.00  0.00           O+0
+HETATM    2  O   UNK     0       5.240   2.048   0.000  0.00  0.00           O+0
+HETATM    3  O   UNK     0       7.214   4.755   0.000  0.00  0.00           O+0
+HETATM    4  O   UNK     0      11.804   3.085   0.000  0.00  0.00           O+0
+HETATM    5  N   UNK     0       7.205  -0.666   0.000  0.00  0.00           N+0
+HETATM    6  N   UNK     0       7.205  -3.145   0.000  0.00  0.00           N+0
+HETATM    7  N   UNK     0       4.414  -0.366   0.000  0.00  0.00           N+0
+HETATM    8  N   UNK     0       3.080  -2.676   0.000  0.00  0.00           N+0
+HETATM    9  N   UNK     0       4.414  -4.986   0.000  0.00  0.00           N+0
+HETATM   10  C   UNK     0       6.780   2.045   0.000  0.00  0.00           C+0
+HETATM   11  C   UNK     0       7.683   0.797   0.000  0.00  0.00           C+0
+HETATM   12  C   UNK     0       7.687   3.289   0.000  0.00  0.00           C+0
+HETATM   13  C   UNK     0       9.151   2.811   0.000  0.00  0.00           C+0
+HETATM   14  C   UNK     0      10.399   3.714   0.000  0.00  0.00           C+0
+HETATM   15  C   UNK     0       5.747  -1.136   0.000  0.00  0.00           C+0
+HETATM   16  C   UNK     0       8.103  -1.906   0.000  0.00  0.00           C+0
+HETATM   17  C   UNK     0       5.747  -2.676   0.000  0.00  0.00           C+0
+HETATM   18  C   UNK     0       4.414  -3.446   0.000  0.00  0.00           C+0
+HETATM   19  C   UNK     0       3.080  -1.136   0.000  0.00  0.00           C+0
+CONECT    1   11   13                                                       
+CONECT    2   10                                                            
+CONECT    3   12                                                            
+CONECT    4   14                                                            
+CONECT    5   11   15   16                                                  
+CONECT    6   16   17                                                       
+CONECT    7   15   19                                                       
+CONECT    8   18   19                                                       
+CONECT    9   18                                                            
+CONECT   10    2   11   12                                                  
+CONECT   11    1    5   10                                                  
+CONECT   12    3   10   13                                                  
+CONECT   13    1   12   14                                                  
+CONECT   14    4   13                                                       
+CONECT   15    5    7   17                                                  
+CONECT   16    5    6                                                       
+CONECT   17    6   15   18                                                  
+CONECT   18    8    9   17                                                  
+CONECT   19    7    8                                                       
+MASTER        0    0    0    0    0    0    0    0   19    0   42    0
+END
+
+#!rasmol -rsm file
+# Creator: RasTop Version 2.0.3 - Copyright (C) Philippe Valadon 2000-2003
+
+zap
+set connect on
+load pdb inline
+set title NONE
+
+# Colour details
+background [0,0,0]
+set backfade off
+set headlight default
+set ambient 40
+set specular off
+set shadepower 50
+set depthcue off
+set shadow off
+stereo off
+
+# Transformation
+reset
+rotate molecule
+set picking ident
+set worlddepth 4366
+# zoom 100.00
+scale 17.46
+position x 0.000 y 0.000 z 0.000
+slab off
+depth off
+
+# Rendering
+set axes off
+set boundingbox off
+set unitcell off
+set bonds off
+set bondmode and
+dots off
+
+# Avoid Colour Problems!
+select all
+colour bonds none
+colour backbone none
+colour hbonds none
+colour ssbonds none
+colour ribbons none
+colour white
+
+# Atoms
+select (atomno>=1) and (atomno<=9)
+colour atoms cpk
+select (atomno>=10) and (atomno<=19)
+colour atoms [255,255,255]
+select all
+spacefill off
+
+# Bonds
+wireframe on
+
+# Ribbons
+ribbons off
+
+# Backbone
+backbone off
+
+# Labels
+labels off
+
+# Monitors
+monitors off
+
+# ssbonds
+ssbonds off
+
+# hbonds
+hbonds off
+
+# Dots
+set solvent false
+set radius 0
+set dots 1
+dots off
+
+# AtomSets
+# no sets
+
+select all
+
+rotate world
+
+exit
