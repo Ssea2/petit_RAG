@@ -1,9 +1,9 @@
 import sys
 import logging
 
-from PySide6.QtWidgets import (QLineEdit, QPushButton, QApplication, QLabel,QScrollArea,QWidget, QMainWindow, QHBoxLayout,
-    QVBoxLayout, QDialog)
-from PySide6.QtCore import QObject, Signal, QThread, Slot
+from PySide6.QtWidgets import (QLineEdit, QPushButton, QApplication, QLabel,QScrollArea,QWidget, QMainWindow, QHBoxLayout, QFrame, QSizePolicy,
+    QVBoxLayout)
+from PySide6.QtCore import QObject, Signal, QThread, Slot, Qt
 
 from custom_ragV2_choix_similarity import RAG_stack_GUI
 
@@ -41,12 +41,25 @@ class RAG_stack(QObject):
 
 
 class GUI_RAG(QMainWindow):
+    
 
     def __init__(self, parent=None):
         super(GUI_RAG, self).__init__(parent)
         logging.info("démarage de l'application")
         # data 
         self.prompt = ""
+        self.chat_style_RAG =  """
+                border: 2px solid black;       
+                background-color: lightblue;   
+                padding: 5px;                  
+                border-radius: 5px;            
+            """
+        self.chat_style_user =  """
+                border: 2px solid black;       
+                background-color: lightgreen;   
+                padding: 5px;                  
+                border-radius: 5px;            
+            """
 
         # création de la page
         self.raw_window = QWidget(self)
@@ -71,6 +84,7 @@ class GUI_RAG(QMainWindow):
         # creation du boutton
         self.start_button = QPushButton()
         self.start_button.clicked.connect(self.get_prompt)
+        self.prompt_entry.returnPressed.connect(self.get_prompt)
 
         # ajout des elements au a la box entry
         self.entry.addWidget(self.prompt_entry) 
@@ -84,6 +98,10 @@ class GUI_RAG(QMainWindow):
         self.chat_scroll_area.setWidgetResizable(True)
         self.chat_history_window = QWidget()
         self.chat_history_content = QVBoxLayout(self.chat_history_window)
+        self.chat_history_content.setSpacing(20)
+        self.chat_history_content.setContentsMargins(10, 10, 10, 10)  # left, top, right, bottom
+        self.chat_history_content.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
+
         
         self.chat_scroll_area.setWidget(self.chat_history_window)
         self.chat_window.addWidget(self.chat_scroll_area)
@@ -104,7 +122,15 @@ class GUI_RAG(QMainWindow):
         self.prompt_entry.clear()
 
         msg =QLabel(self.prompt)
+        msg.setStyleSheet(self.chat_style_user)
+        msg.setWordWrap(True)
+        msg.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        msg.setAlignment(Qt.AlignmentFlag.AlignTop)
+        
+
         self.chat_history_content.addWidget(msg)
+        
+        
         self.RAG_thread()
     
     
@@ -129,10 +155,16 @@ class GUI_RAG(QMainWindow):
         last_id_idx = last_id-1
         if last_id%2==0:
             qlabel = self.get_Qlabel(last_id_idx)
-            msg = qlabel.setText(qlabel.text()+text)
+            markdown_text = str(qlabel.text()+text)
+            msg = qlabel.setText(markdown_text)
         else:
             msg = QLabel(text)
-            self.chat_history_content.addWidget(msg)
+            msg.setStyleSheet(self.chat_style_RAG)
+            msg.setWordWrap(True)
+            msg.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+            msg.setAlignment(Qt.AlignmentFlag.AlignTop)   
+
+            self.chat_history_content.addWidget(msg) 
         # Défilement automatique vers le bas
         self.chat_scroll_area.verticalScrollBar().setValue(
             self.chat_scroll_area.verticalScrollBar().maximum()
