@@ -1,5 +1,8 @@
 import sys
 import logging
+import markdown
+import urllib.parse
+
 
 from PySide6.QtWidgets import (QLineEdit, QPushButton, QApplication, QLabel,QScrollArea,QWidget, QMainWindow, QHBoxLayout, QFrame, QSizePolicy,
     QVBoxLayout)
@@ -26,14 +29,21 @@ class RAG_stack(QObject):
 
     @Slot()
     def run(self):
-        stream, files = RAG_stack_GUI(input_query=self.text, history=[], llm="llama3.2:1b") # qwen3:0.6b-q4_K_M
-        msg2=""
+        stream, files = RAG_stack_GUI(input_query=self.text, history=[], llm="qwen3:0.6b-q4_K_M") # qwen3:0.6b-q4_K_M
         for chunk in stream:
             rep = chunk['message']['content']
             msg2=str(rep)
             self.word_ready.emit(msg2)
+        msg2 = """
+        <p><h4> **SOURCE : **<h4></p>
+        """
+        self.word_ready.emit(msg2)
         for file in files:
-            msg2=(file + "\n")
+            url = "file://" +file# encode l'espace en %20
+            print(url)
+            html = f'<p><a href="{url}">{url}</a><p>'
+            #print(file)
+            msg2=html
             self.word_ready.emit(msg2)
 
         
@@ -48,17 +58,20 @@ class GUI_RAG(QMainWindow):
         logging.info("démarage de l'application")
         # data 
         self.prompt = ""
+        self.answertmp = ""
         self.chat_style_RAG =  """
                 border: 2px solid black;       
-                background-color: lightblue;   
-                padding: 5px;                  
-                border-radius: 5px;            
+                background-color: lightblue;                     
+                border-radius: 5px;     
+                padding: 5px; 
+                margin: 0px;    
             """
         self.chat_style_user =  """
                 border: 2px solid black;       
-                background-color: lightgreen;   
-                padding: 5px;                  
+                background-color: lightgreen;                    
                 border-radius: 5px;            
+                padding: 5px; 
+                margin: 0px; 
             """
 
         # création de la page
@@ -126,7 +139,6 @@ class GUI_RAG(QMainWindow):
         msg.setWordWrap(True)
         msg.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         msg.setAlignment(Qt.AlignmentFlag.AlignTop)
-        
 
         self.chat_history_content.addWidget(msg)
         
@@ -155,14 +167,22 @@ class GUI_RAG(QMainWindow):
         last_id_idx = last_id-1
         if last_id%2==0:
             qlabel = self.get_Qlabel(last_id_idx)
-            markdown_text = str(qlabel.text()+text)
-            msg = qlabel.setText(markdown_text)
+            text = str(self.answertmp+text)
+            self.answertmp=text
+            html = markdown.markdown(text)
+            msg = qlabel.setText(html)
         else:
-            msg = QLabel(text)
+            self.answertmp=""
+            html = markdown.markdown(text)
+            msg = QLabel(html)
             msg.setStyleSheet(self.chat_style_RAG)
             msg.setWordWrap(True)
+            msg.setOpenExternalLinks(True) 
+            
             msg.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
             msg.setAlignment(Qt.AlignmentFlag.AlignTop)   
+            msg.setTextFormat(Qt.TextFormat.RichText)  # Important pour le HTML
+            msg.setOpenExternalLinks(True) 
 
             self.chat_history_content.addWidget(msg) 
         # Défilement automatique vers le bas

@@ -101,7 +101,7 @@ def RAG_stack(input_query, history, llm="llama3.2:1b"):
     #print("prompt",start-time.time())
     #print(files)
     print(results)
-    instruction_prompt = f'''You are a helpful chatbot.
+    instruction_prompt = f'''You are a helpful chatbot, all your answer need to be in markdown even the space a return to line.
     Use only the following pieces of context to answer the question, if no context respond "no information available". Don't make up any new information:
     question: {input_query}
     context: {dataresult}

@@ -1,7 +1,9 @@
 torch  --index-url https://download.pytorch.org/whl/cu130
 torchvision --index-url https://download.pytorch.org/whl/cu130
-llama-index 
+ollama
+PySide6
+markdown 
 chromadb
 langchain-community
 pymupdf
-streamlit
+markdown
