@@ -40,7 +40,7 @@ class RAG_stack(QObject):
         self.word_ready.emit(msg2)
         for file in files:
             url = "file://" +file# encode l'espace en %20
-            print(url)
+            #print(url)
             html = f'<p><a href="{url}">{url}</a><p>'
             #print(file)
             msg2=html

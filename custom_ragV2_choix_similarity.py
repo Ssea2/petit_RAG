@@ -9,6 +9,7 @@ code du prof
 """
 import ollama
 import chromadb
+import os 
 #from llama_index.core import SimpleDirectoryReader
 from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
 from langchain_community.document_loaders import DirectoryLoader, TextLoader, PyMuPDFLoader
@@ -24,30 +25,24 @@ YELLOW = '\033[93m'
 NEON_GREEN = '\033[92m'
 RESET_COLOR = '\033[0m'
 
-def upload_data(file : str,
-                embmod,
-                isdir : bool =False,
-                required_ext : str = "**/*.pdf") -> int:
-
-    chunk_size = 26
-    chunk_overlap = 4
+def upload_data(
+        file : str,
+        embmod,
+        isdir : bool =False,
+        required_ext : str = "**/*.pdf",
+        chunk_size : int = 26,
+        chunk_overlap : int = 4,
+        ) -> int:
+   
 
     # Créer un splitter
-    splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=128)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
     #print("récupération des fichiers")
     if isdir==True:
-        """reader = SimpleDirectoryReader(
-            input_dir=file,
-            required_exts=required_exts,
-            recursive=True,
-        )"""
+
         loader = DirectoryLoader(file, glob=required_ext, loader_cls=PyMuPDFLoader, recursive=True, silent_errors=True)
 
     else:
-        """reader = SimpleDirectoryReader(
-            input_files=file,
-        )
-        """
         loader = TextLoader(file)
     docs = loader.load()#reader.load_data()
     split_docs = []
@@ -56,35 +51,26 @@ def upload_data(file : str,
         split_docs.extend(splitter.split_documents([doc])) 
     #print(split_docs[0].metadata)
     #print("formatage des données")
-    data = {}
-    for i in tqdm(range(len(split_docs))):
-        doc = str(split_docs[i].page_content)+"<PATH>"+str(split_docs[i].metadata["file_path"])
+    """for i in tqdm(range(len(split_docs))):
+        doc = str(split_docs[i].page_content)
         embdata = ollama.embed(model=embmod, input=doc)["embeddings"]
         id = hashlib.sha256(doc.encode()).hexdigest()
+        nospace_filename = str(split_docs[i].metadata["file_path"]).replace(" ", "_")
         #data[id]=doc
         chroma_collection.upsert(
             ids=id,
             documents=doc,
-            embeddings=embdata
-        )
-    
-    """idl = list(data.keys())
-    context_doc = list(data.values())
-    n=len(idl)
-    print("sauvegarde des fichiers")
-    for i in tqdm(range(0, n, 1)):
-        toget = n-i
-        idl = idl[i:i+toget]
-        docl = context_doc[i:i+toget]
-        chroma_collection.upsert(
-            ids=idl,
-            documents=docl
+            embeddings=embdata,
+            metadatas={"files_path": nospace_filename}
         )"""
     return 0 
 
 
-def RAG_stack(input_query, history, llm="llama3.2:1b"):
-    start=time.time()
+def RAG_stack(
+        input_query : str, 
+        history : list, 
+        llm : str ="llama3.2:1b"
+        ) -> str | str : 
     #print("query",start)
     input_query = str(history)+","+input_query
     results = chroma_collection.query(
@@ -100,7 +86,7 @@ def RAG_stack(input_query, history, llm="llama3.2:1b"):
     files = set(files)
     #print("prompt",start-time.time())
     #print(files)
-    print(results)
+    #print(results)
     instruction_prompt = f'''You are a helpful chatbot, all your answer need to be in markdown even the space a return to line.
     Use only the following pieces of context to answer the question, if no context respond "no information available". Don't make up any new information:
     question: {input_query}
@@ -127,7 +113,7 @@ def RAG_stack(input_query, history, llm="llama3.2:1b"):
     #print("\n\nSOURCE:")
     for file in files:
         print(PINK+file+RESET_COLOR)
-    return input_query
+    return input_query, reponse
 
 
 def RAG_stack_GUI(input_query, history, llm="llama3.2:1b"):
@@ -172,11 +158,14 @@ embedding_model = OllamaEmbeddingFunction(
     url="http://localhost:11434/api/embeddings",)
 
 client = chromadb.PersistentClient(path="chroma_db/robia") # robia/isa88 robia2(filtered robia)
-chroma_collection = client.get_or_create_collection("robia3",embedding_function=embedding_model,configuration={
+chroma_collection = client.get_or_create_collection("robia",embedding_function=embedding_model,configuration={
         "hnsw": {
             "space": "cosine",
         }
     })
+
+upload_data(r"data/SVT", embmod=embm, isdir=True)
+#print(os.path.isfile("data/SVT/cour prof pronote/T1.pdf"))
 
 #upload_data("data/SVT", isdir=True, embmod=embm)
 """history=[]

@@ -6,4 +6,4 @@ markdown
 chromadb
 langchain-community
 pymupdf
-markdown
+tqdm
