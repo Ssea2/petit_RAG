@@ -4,11 +4,11 @@ import markdown
 import urllib.parse
 
 
-from PySide6.QtWidgets import (QLineEdit, QPushButton, QApplication, QLabel,QScrollArea,QWidget, QMainWindow, QHBoxLayout, QFrame, QSizePolicy,
+from PySide6.QtWidgets import (QLineEdit, QPushButton, QApplication, QLabel,QScrollArea,QWidget, QMainWindow, QHBoxLayout, QFileDialog, QSizePolicy,
     QVBoxLayout)
-from PySide6.QtCore import QObject, Signal, QThread, Slot, Qt
+from PySide6.QtCore import QObject, Signal, QThread, Slot, Qt, QUrl
 
-from custom_ragV2_choix_similarity import RAG_stack_GUI
+from custom_ragV2_choix_similarity import RAG_Answer
 
 # Configuration du logging
 logging.basicConfig(
@@ -26,27 +26,36 @@ class RAG_stack(QObject):
     def __init__(self, text):
         super().__init__()
         self.text = text
+        self.rag = RAG_Answer(llm="qwen3:0.6b-q4_K_M", top_n_result=30)
 
-    @Slot()
     def run(self):
-        stream, files = RAG_stack_GUI(input_query=self.text, history=[], llm="qwen3:0.6b-q4_K_M") # qwen3:0.6b-q4_K_M
+        stream, files = self.rag.rag_stack(self.text)
+        print(files)
         for chunk in stream:
             rep = chunk['message']['content']
             msg2=str(rep)
             self.word_ready.emit(msg2)
         msg2 = """
-        <p><h4> **SOURCE : **<h4></p>
+         <p><h4> **SOURCE : **<h4></p>
         """
         self.word_ready.emit(msg2)
-        for file in files:
-            url = "file://" +file# encode l'espace en %20
+        for file in set(files):
+            url = QUrl.fromLocalFile(file).toString()
             #print(url)
-            html = f'<p><a href="{url}">{url}</a><p>'
+            html = f'<a href="{url}" style="text-decoration:none; color:blue;">{url}</a>' #f'<p><a href="{url}">{url}</a><p>'
             #print(file)
             msg2=html
             self.word_ready.emit(msg2)
 
-        
+"""class Upload_data(QObject):
+    finished = Signal()
+
+    def __init__(self, paths):
+        super().__init__(Upload_data)
+        self.paths = paths
+    
+    def run(self):
+        pass"""
         
 
 
@@ -190,6 +199,26 @@ class GUI_RAG(QMainWindow):
             self.chat_scroll_area.verticalScrollBar().maximum()
         )
 
+"""    def link_data(self):
+        files_path, _ = QFileDialog.getOpenFileNames(
+            self,
+            "Sélectionner les fichiers à importer",
+            "",
+            "Tous les fichiers (*.*)"
+        )
+        logging.info("démarage du thread => RAG")
+        thread = QThread(self)
+        worker = Upload_data(files_path)
+        worker.moveToThread(thread)
+
+        thread.started.connect(worker.run)
+        
+        worker.word_ready.connect(self.RAG_answer)
+        worker.finished.connect(thread.quit)
+        worker.finished.connect(worker.deleteLater)
+        thread.finished.connect(thread.deleteLater)
+        thread.start()
+        logging.info("fin du thread => RAG")"""
         
         
 

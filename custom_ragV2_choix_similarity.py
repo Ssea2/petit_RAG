@@ -66,55 +66,6 @@ def upload_data(
     return 0 
 
 
-def RAG_stack(
-        input_query : str, 
-        history : list, 
-        llm : str ="llama3.2:1b"
-        ) -> str | str : 
-    #print("query",start)
-    input_query = str(history)+","+input_query
-    results = chroma_collection.query(
-      query_texts=[input_query], # Chroma will embed this for you
-      n_results=10 # how many results to return
-    )
-    dataresult = results["documents"]
-    #distanceresult = results["distances"]
-    #retrieved_knowledge = zip(dataresult,distanceresult)
-    files = []
-    for i in dataresult[0]:
-        files.append(i.split("<PATH>")[-1])
-    files = set(files)
-    #print("prompt",start-time.time())
-    #print(files)
-    #print(results)
-    instruction_prompt = f'''You are a helpful chatbot, all your answer need to be in markdown even the space a return to line.
-    Use only the following pieces of context to answer the question, if no context respond "no information available". Don't make up any new information:
-    question: {input_query}
-    context: {dataresult}
-    '''
-
-    #print(results)
-    stream = ollama.chat(
-        model=llm,
-        messages=[
-        {'role': 'system', 'content': instruction_prompt},
-        {'role': 'user', 'content': input_query},
-        ],
-        stream=True,
-    )
-    #print("print",start-time.time())
-    # print the response from the chatbot in real-time
-    reponse=[]
-    #print('Chatbot response:')
-    for chunk in stream:
-        rep = chunk['message']['content']
-        print(NEON_GREEN + rep + RESET_COLOR, end='', flush=True)
-        reponse.append(rep)
-    #print("\n\nSOURCE:")
-    for file in files:
-        print(PINK+file+RESET_COLOR)
-    return input_query, reponse
-
 
 def RAG_stack_GUI(input_query, history, llm="llama3.2:1b"):
     #print("query",start)
@@ -133,7 +84,7 @@ def RAG_stack_GUI(input_query, history, llm="llama3.2:1b"):
     #print("prompt",start-time.time())
     #print(files)
     #print(results)
-    instruction_prompt = f'''Tu est un chatbot utile, si il y a du contexte entre les banieres <CONTEXTE> répond a la question présent dans les banieres <QUESTION> 
+    instruction_prompt = f'''Tu est un chatbot utile, si il y a du contexte entre les banieres <CONTEXTE> répond a la question présent dans les banieres <QUESTION> de manière a répondre au mieux avec le plus de détails. Si il y a des url tu les met sosu la forme <a href="url" style="text-decoration:none; color:blue;">"url"</a>' 
     <QUESTION> {input_query} <QUESTION>
     <CONTEXTE> {dataresult} <CONTEXTE>
     '''
@@ -152,6 +103,120 @@ def RAG_stack_GUI(input_query, history, llm="llama3.2:1b"):
     return stream, files
 
 
+class RAG_Upload():
+
+    def __init__(self, db, embeding_model, chunk_size:int=4048, overlap_size:int=1028):
+        # param splitter
+        self.chunk_size = chunk_size
+        self.overlap_size = overlap_size
+        self.splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size, chunk_overlap=self.overlap_size)
+
+        # stockage temporaire
+        self.docs:list = []
+        self.split_docs:list = []
+
+        # db 
+        self.chroma_collection = db 
+        self.embmod = embeding_model
+
+    def get_document(self, paths:list[str], required_ext:list[str]= ["**/*.pdf"]):
+        for file in paths:
+            isdir = os.path.isdir(file)
+            if isdir==True:
+                loader = DirectoryLoader(file, glob=required_ext, loader_cls=PyMuPDFLoader, recursive=True, silent_errors=True)
+            else:
+                loader = PyMuPDFLoader(file)
+            self.docs = loader.load()#reader.load_data()"""
+        """for root, dirs, files in tqdm(os.walk(paths)):
+            for dir in dirs:
+                dir_path = os.path.join(root,dir)
+                new_dir_path = dir_path.replace(' ', '_')
+                os.rename(dir_path, new_dir_path)
+            for file in files:
+                file_path = os.path.join(root, file)
+                new_file_path = file_path.replace(' ', '_')
+                os.rename(file_path, new_file_path)"""     
+
+    def split_document(self):
+        for doc in self.docs:
+            self.split_docs.extend(self.splitter.split_documents([doc])) 
+
+    def fill_db(self):
+        for i in tqdm(range(len(self.split_docs))):
+            doc = str(self.split_docs[i].page_content)
+            embdata = ollama.embed(model=self.embmod, input=doc)["embeddings"]
+            id = hashlib.sha256(doc.encode()).hexdigest()
+            nospace_filename = str(self.split_docs[i].metadata["file_path"])#.replace(" ", "_")
+            #data[id]=doc
+            self.chroma_collection.upsert(
+                ids=id,
+                documents=doc,
+                embeddings=embdata,
+                metadatas={"files_path": nospace_filename}
+            )
+
+    def stack(self, paths:list):
+        self.get_document(paths)
+        self.split_document()
+        self.fill_db()
+
+
+class RAG_Answer():
+
+    def __init__(self, llm="llama3.2:1b", top_n_result: int = 10):
+        
+        self.llm = llm
+        self.n_result = top_n_result
+        self.results = []
+        self.files_sources = []
+        self.textdata = []
+        self.instruction_prompt = "Tu est un chatbot utile, si il y a du contexte entre les banieres <CONTEXTE> répond a la question présent dans les banieres <QUESTION> "
+
+    def get_input_prompt(self, input_query, history):
+        self.prompt = str(history)+","+input_query
+
+    def similarity_search(self):
+        self.results = chroma_collection.query(
+        query_texts=[self.prompt], # Chroma will embed this for you
+        n_results=self.n_result # how many results to return
+        )
+        #print(self.results["metadatas"])
+        for file_path in self.results["metadatas"]:
+            if type(file_path) != str:
+                for file in file_path:
+                    self.files_sources.append(file['files_path'])
+            else:
+                self.files_sources.append(file_path["files_path"]) 
+        self.textdata = self.results["documents"]
+        self.files_sources = list(set(self.files_sources))
+        
+
+    def update_prompt(self):
+        self.enchanced_prompt = f'''Tu est un chatbot utile, si il y a du contexte entre les banieres <CONTEXTE> répond a la question présent dans les banieres <QUESTION> 
+        <QUESTION> {self.prompt} <QUESTION>
+        <CONTEXTE> {self.textdata} <CONTEXTE>
+        '''
+        #print(self.enchanced_prompt)
+        
+    def rag_prompt(self):
+        stream = ollama.chat(
+        model=self.llm,
+        messages=[
+        {'role': 'system', 'content': self.instruction_prompt},
+        {'role': 'user', 'content': self.enchanced_prompt},
+        ],
+        stream=True,
+        )
+        return stream, self.files_sources
+
+    def rag_stack(self, input, hist: list = []):
+        self.get_input_prompt(input, hist)
+        self.similarity_search()
+        self.update_prompt()
+        stream, files = self.rag_prompt()
+        return stream, files
+
+
 embm = "nomic-embed-text"
 embedding_model = OllamaEmbeddingFunction(
     model_name=embm,     # ou "mxbai‑embed‑large", ou "chroma/all‑minilm‑l6‑v2‑f32"
@@ -164,7 +229,11 @@ chroma_collection = client.get_or_create_collection("robia",embedding_function=e
         }
     })
 
-upload_data(r"data/SVT", embmod=embm, isdir=True)
+RAG_Upload(chroma_collection, embeding_model=embm, chunk_size=512, overlap_size=128).stack([r"data/automatisme/25-26 LP3 R520 - Intro ISA-88v3.pdf"])
+#stream , file = RAG_Answer().rag_stack("explain how to instyall rocm", [])
+#print(file)
+#RAG_Upload(chroma_collection, embm).get_document(r"data")
+#upload_data(r"data/SVT", embmod=embm, isdir=True)
 #print(os.path.isfile("data/SVT/cour prof pronote/T1.pdf"))
 
 #upload_data("data/SVT", isdir=True, embmod=embm)
