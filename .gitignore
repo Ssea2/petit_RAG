@@ -1,4 +1,5 @@
 venv
 __pycache__
-data
+!data/automatisme/d800012x062_Batch_Tutorial.pdf
+data/*
 imports
