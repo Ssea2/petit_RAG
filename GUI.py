@@ -7,10 +7,10 @@ from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
 
 
 from PySide6.QtWidgets import (QLineEdit, QPushButton, QApplication, QLabel,QScrollArea,QWidget, QMainWindow, QHBoxLayout, QFileDialog, QSizePolicy,
-    QVBoxLayout)
+    QVBoxLayout, QTextEdit)
 from PySide6.QtCore import QObject, Signal, QThread, Slot, Qt, QUrl
 
-from custom_ragV2_choix_similarity import RAG_Answer
+from custom_ragV2_choix_similarity import RAG_Answer, RAG_Upload
 
 # Configuration du logging
 logging.basicConfig(
@@ -48,23 +48,31 @@ class RAG_stack(QObject):
             #print(file)
             msg2=html
             self.word_ready.emit(msg2)
+        self.finished.emit()
 
-"""class Upload_data(QObject):
+class Upload_data(QObject):
     finished = Signal()
 
-    def __init__(self, paths):
-        super().__init__(Upload_data)
+    def __init__(self, db, embeding_model, paths):
+        super().__init__()
+        #print("TAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         self.paths = paths
-    
+        self.rag_upload = RAG_Upload(db=db, embeding_model=embeding_model)
+
     def run(self):
-        pass"""
+        print("get doc")
+        self.rag_upload.get_document(self.paths)
+        print("split doc")
+        self.rag_upload.split_document()
+        print("fill db")
+        self.rag_upload.fill_db()
+        print("emit")
+        self.finished.emit()
         
-
-
 class GUI_RAG(QMainWindow):
     
 
-    def __init__(self, db, parent=None):
+    def __init__(self, db, embeding_model, parent=None):
         super(GUI_RAG, self).__init__(parent)
         logging.info("démarage de l'application")
         # data 
@@ -85,6 +93,7 @@ class GUI_RAG(QMainWindow):
                 margin: 0px; 
             """
         self.db = db
+        self.embeding_model = embeding_model
 
         # création de la page
         self.raw_window = QWidget(self)
@@ -94,26 +103,31 @@ class GUI_RAG(QMainWindow):
         self.chat_window = QVBoxLayout(self.raw_window)
 
         self.show_chat()
-        self.question_entry()
-        
-        
+        self.question_entry()     
 
     def question_entry(self):
         # creation d'un box pour contenir l'entree es le boutton pour recup le prompt
         self.entry = QHBoxLayout()
 
         # creation de l'entrée qui a comme text de fons prompt ...
-        self.prompt_entry = QLineEdit()
+        self.prompt_entry = QTextEdit()
         self.prompt_entry.setPlaceholderText("Prompt...")
+        self.prompt_entry.setLineWrapMode(QTextEdit.WidgetWidth)
+        self.prompt_entry.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Maximum)
 
-        # creation du boutton
-        self.start_button = QPushButton()
+        # creation du boutton envoie du prompt
+        self.start_button = QPushButton("=>")
         self.start_button.clicked.connect(self.get_prompt)
-        self.prompt_entry.returnPressed.connect(self.get_prompt)
+        #self.prompt_entry.returnPressed.connect(self.get_prompt)
+
+        # creation du boutton upload data
+        self.upload_button = QPushButton("+")
+        self.upload_button.clicked.connect(self.link_data)
 
         # ajout des elements au a la box entry
         self.entry.addWidget(self.prompt_entry) 
         self.entry.addWidget(self.start_button)
+        self.entry.addWidget(self.upload_button)
 
         # ajout de la box dans dans le main
         self.chat_window.addLayout(self.entry)
@@ -131,8 +145,6 @@ class GUI_RAG(QMainWindow):
         self.chat_scroll_area.setWidget(self.chat_history_window)
         self.chat_window.addWidget(self.chat_scroll_area)
      
-
-
     def get_last_answer_id(self):
         last_id = self.chat_history_content.count()
         return last_id
@@ -143,7 +155,7 @@ class GUI_RAG(QMainWindow):
 
     def get_prompt(self):
         logging.info("récupération du prompt")
-        self.prompt=self.prompt_entry.text()
+        self.prompt=self.prompt_entry.toPlainText()
         self.prompt_entry.clear()
 
         msg =QLabel(self.prompt)
@@ -156,7 +168,6 @@ class GUI_RAG(QMainWindow):
         
         
         self.RAG_thread()
-    
     
     def RAG_thread(self):
         logging.info("démarage du thread => RAG")
@@ -202,26 +213,26 @@ class GUI_RAG(QMainWindow):
             self.chat_scroll_area.verticalScrollBar().maximum()
         )
 
-"""    def link_data(self):
+    def link_data(self):
         files_path, _ = QFileDialog.getOpenFileNames(
             self,
             "Sélectionner les fichiers à importer",
             "",
             "Tous les fichiers (*.*)"
         )
-        logging.info("démarage du thread => RAG")
-        thread = QThread(self)
-        worker = Upload_data(files_path)
-        worker.moveToThread(thread)
+        logging.info("démarage du thread => UPLOAD")
+        #print("path", files_path)
+        self.thread_upload = QThread(self)
+        self.worker_upload = Upload_data(self.db, self.embeding_model , files_path)
+        self.worker_upload.moveToThread(self.thread_upload)
 
-        thread.started.connect(worker.run)
+        self.thread_upload.started.connect(self.worker_upload.run)
         
-        worker.word_ready.connect(self.RAG_answer)
-        worker.finished.connect(thread.quit)
-        worker.finished.connect(worker.deleteLater)
-        thread.finished.connect(thread.deleteLater)
-        thread.start()
-        logging.info("fin du thread => RAG")"""
+        self.worker_upload.finished.connect(self.thread_upload.quit)
+        self.worker_upload.finished.connect(self.worker_upload.deleteLater)
+        self.thread_upload.finished.connect(self.thread_upload.deleteLater)
+        self.thread_upload.start()
+        logging.info("fin du thread => UPLOAD")
         
         
 
@@ -240,7 +251,7 @@ if __name__ == '__main__':
     # Create the Qt Application
     app = QApplication(sys.argv)
     # Create and show the form
-    form = GUI_RAG(db=chroma_collection)
+    form = GUI_RAG(db=chroma_collection, embeding_model=embm)
     form.show()
     # Run the main Qt loop
     sys.exit(app.exec())

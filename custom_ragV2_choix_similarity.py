@@ -85,29 +85,34 @@ class RAG_Answer():
     def get_input_prompt(self, input_query, history):
         self.prompt = str(history)+","+input_query
 
-    def similarity_search(self):
+    def similarity_search(self, threshold=0.3):
+        self.files_sources = []
+        self.textdata = []
         self.results = self.db.query(
         query_texts=[self.prompt], # Chroma will embed this for you
         n_results=self.n_result # how many results to return
         )
-        #print(self.results["metadatas"])
-        for file_path in self.results["metadatas"]:
-            if type(file_path) != str:
-                for file in file_path:
-                    self.files_sources.append(file['files_path'])
+        #print(self.results)
+        len_result = len(self.results['ids'][0])
+        for i in range(len_result):
+            if self.results["distances"][0][i] < threshold:
+                pass 
             else:
-                self.files_sources.append(file_path["files_path"]) 
-        self.textdata = self.results["documents"]
+                self.files_sources.append(self.results["metadatas"][0][i]["files_path"])
+                self.textdata.append(self.results["documents"])
         self.files_sources = list(set(self.files_sources))
+                
+
+
         
 
     def update_prompt(self):
         self.enchanced_prompt = f'''Tu est un chatbot utile, 
-        si il y a du contexte entre les banieres <CONTEXTE> répond a la question présent dans les banieres <QUESTION> 
-        de manière a répondre au mieux avec le plus de détails. Si il y a des url tu les met sosu la forme <a href="url" style="text-decoration:none; color:blue;">"url"</a>' 
+        si il y a du contexte entre les bannieres <CONTEXTE> répond a la question présent dans les bannieres <QUESTION> 
+        de maninère a répondre au mieux avec le plus de détails. Si il y a des url tu les met sous la forme <a href="url" style="text-decoration:none; color:blue;">"url"</a>' 
     
         <QUESTION> {self.prompt} <QUESTION>
-        <CONTEXTE> {self.textdata} <CONTEXTE>instruction_prompt = f'''
+        <CONTEXTE> {self.textdata} <CONTEXTE>'''
         #print(self.enchanced_prompt)
         
     def rag_prompt(self):
@@ -142,23 +147,5 @@ if __name__=="__main__":
             }
         })
 
-    RAG_Upload(chroma_collection, embeding_model=embm, chunk_size=512, overlap_size=128).stack([liste de fichier])
-    #stream , file = RAG_Answer().rag_stack("explain how to instyall rocm", [])
-    #print(file)
-    #RAG_Upload(chroma_collection, embm).get_document(r"data")
-    #upload_data(r"data/SVT", embmod=embm, isdir=True)
-    #print(os.path.isfile("data/SVT/cour prof pronote/T1.pdf"))
-
-    #upload_data("data/SVT", isdir=True, embmod=embm)
-    """history=[]
-    while True:
-        prompt = input("prompt: ")
-        if prompt.lower()=="/bye":
-            break
-            pass
-        if prompt.lower()=="/clear":
-            history=[]
-            pass
-        else:
-            tmp=RAG_stack(input_query=prompt, history=history, llm="qwen3:0.6b-q4_K_M")
-            history.append(tmp)"""
+    RAG_Upload(chroma_collection, embeding_model=embm, chunk_size=512, overlap_size=128).stack(["liste de fichier"])
+    
