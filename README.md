@@ -35,7 +35,8 @@ avec la liste de fichier a upload (ne marche que sur des pdf pour l'instant)
 
 # todo 
 
-- [X] ajoute rune interface pour posez des questions
-- [] GUI pour upload les documents dans la bdd local du RAG
+- [X] ajoute d'une interface pour posez des questions
+- [X] GUI pour ajouter des documents dans la bdd local du RAG
+- [] GUI pour enlever des documents dans la bdd local du RAG
 - [] ajouter un historique des questions prix en compte dans le RAG
 - [] upload plus detype de documents (txt/.md , .odt, .docx, .xlsx, .pptx)
