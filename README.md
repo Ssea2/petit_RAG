@@ -9,7 +9,7 @@ recomendé: python 3.12
 
 ```bash
 
-python3.12 -m venv <nom de l'env>
+python3.12 -m venv <nom de l\'env>
 
 # linux 
 source ./venv/bin/activate
