@@ -30,7 +30,7 @@ lancer [[GUI.py]] puis posez ça question
 pour l'instant il pour upload des documents il faut lancer custom_ragV2_choix_similarity.py
 avec la liste de fichier a upload (ne marche que sur des pdf pour l'instant)
 
-![exemple](docs/exemple.png)
+![exemple](docs/images/exemple.png)
 
 
 # todo 
