@@ -30,13 +30,23 @@ lancer [[GUI.py]] puis posez ça question
 pour l'instant il pour upload des documents il faut lancer custom_ragV2_choix_similarity.py
 avec la liste de fichier a upload (ne marche que sur des pdf pour l'instant)
 
-![exemple](docs/exemple.png)
+![exemple](docs/images/exemple.png)
 
 
 # todo 
 
 - [X] ajoute d'une interface pour posez des questions
 - [X] GUI pour ajouter des documents dans la bdd local du RAG
-- [] GUI pour enlever des documents dans la bdd local du RAG
+- [X] GUI pour enlever des documents dans la bdd local du RAG
 - [] ajouter un historique des questions prix en compte dans le RAG
 - [] upload plus detype de documents (txt/.md , .odt, .docx, .xlsx, .pptx)
+
+
+# comment contribuer 
+
+1/ crée une branche suivant la "convention de nommage" Gitflow           
+2/ suivre les "conventional commit" pour push des changements
+
+# Licence
+
+Ce projet est sous licence **MIT**. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
