@@ -69,7 +69,7 @@ class RAG_Upload():
                 ids=id,
                 documents=doc,
                 embeddings=embdata,
-                metadatas={"files_path": nospace_filename}
+                metadatas={"file_path": nospace_filename}
             )
         self.store_file_name(files_paths)
 
@@ -80,20 +80,33 @@ class RAG_Upload():
 
 class RAG_Delete():
 
-    def __init__(self, name_files_in_bdd:str="bdd/rag/files_in_rag.txt"):
+    def __init__(self, db, name_files_in_bdd:str="bdd/rag/files_in_rag.txt"):
         # fichier pour lire les fichier sauvegardé
         self.file_for_files_in_bdd = name_files_in_bdd
+        self.collection = db
 
         # fichier lue
         self.all_files_in_bdd: list = []
     
     def get_files_saved(self):
         with open(self.file_for_files_in_bdd, "r") as file:
-            self.all_files_in_bdd = file.read().split(";")
+            self.all_files_in_bdd = [file for file in file.read().split(";") if len(file) > 1]
+        return self.all_files_in_bdd
 
     def show_saved_files(self):
         print(self.all_files_in_bdd)
     
+    def remove_data(self, tokeep):
+        #print({"file_path": path for path in self.all_files_in_bdd})
+        self.collection.delete(where={
+                "file_path": {
+                    "$in": self.all_files_in_bdd  # Doit être une liste de strings
+                }
+            }
+        )
+        with open(self.file_for_files_in_bdd, "w") as file:
+            file.write(";".join(tokeep) + ";")
+        #print(self.collection.get(limit=1, include=["metadatas"])['metadatas'])
 
 
 class RAG_Answer():
@@ -125,10 +138,9 @@ class RAG_Answer():
             if self.results["distances"][0][i] < threshold:
                 pass 
             else:
-                self.files_sources.append(self.results["metadatas"][0][i]["files_path"])
+                self.files_sources.append(self.results["metadatas"][0][i]["file_path"])
                 self.textdata.append(self.results["documents"])
         self.files_sources = list(set(self.files_sources))
-                
 
 
         
@@ -178,6 +190,6 @@ if __name__=="__main__":
     t = RAG_Delete()
     t.get_files_saved()
     t.show_saved_files()
-    print([len(i) for i in t.all_files_in_bdd])
+    print()
 
     #print(chroma_collection.get(include=["metadatas"]).get("metadatas"))

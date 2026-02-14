@@ -6,11 +6,11 @@ import chromadb
 from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
 
 
-from PySide6.QtWidgets import (QLineEdit, QPushButton, QApplication, QLabel,QScrollArea,QWidget, QMainWindow, QHBoxLayout, QFileDialog, QSizePolicy,
-    QVBoxLayout, QTextEdit)
+from PySide6.QtWidgets import (QLineEdit, QPushButton, QApplication, QLabel,QScrollArea,QWidget, QMainWindow, QHBoxLayout, QFileDialog, QSizePolicy, QDialog,
+    QCheckBox, QDialogButtonBox, QVBoxLayout, QTextEdit, QMessageBox)
 from PySide6.QtCore import QObject, Signal, QThread, Slot, Qt, QUrl
 
-from custom_ragV2_choix_similarity import RAG_Answer, RAG_Upload
+from RAG_tools import RAG_Answer, RAG_Upload, RAG_Delete
 
 # Configuration du logging
 logging.basicConfig(
@@ -19,7 +19,39 @@ logging.basicConfig(
 )
 
 # Exemple de logs
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QProgressBar, QLabel
+from PySide6.QtCore import Qt, QPoint
 
+class NotificationOverlay(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent) # Parent est ta MainWindow
+        
+        # Style pour le look "Overlay"
+        self.setStyleSheet("""
+            background-color: rgba(40, 40, 40, 220); 
+            border: 1px solid #555;
+            border-radius: 8px;
+        """)
+        
+        layout = QVBoxLayout(self)
+        self.label = QLabel("Action en cours...")
+        self.label.setStyleSheet("color: white; border: none;")
+        self.progress = QProgressBar()
+        self.progress.setFixedHeight(15)
+        
+        layout.addWidget(self.label)
+        layout.addWidget(self.progress)
+        
+        self.setFixedSize(200, 70)
+        
+        # On le place en haut à gauche avec une petite marge
+        self.move(10, 10) 
+        self.hide() # Caché par défaut
+
+    def update_progress(self, val):
+        self.progress.setValue(val)
+        self.show()
+        if val >= 100: self.hide()
 
 class RAG_stack(QObject):
     word_ready = Signal(str)  # signal pour chaque mot/tronçon
@@ -52,6 +84,7 @@ class RAG_stack(QObject):
 
 class Upload_data(QObject):
     finished = Signal()
+    progress = Signal(int)
 
     def __init__(self, db, embeding_model, paths):
         super().__init__()
@@ -60,15 +93,48 @@ class Upload_data(QObject):
         self.rag_upload = RAG_Upload(db=db, embeding_model=embeding_model)
 
     def run(self):
-        print("get doc")
+        self.progress.emit(0)
         self.rag_upload.get_document(self.paths)
-        print("split doc")
+        self.progress.emit(25)
         self.rag_upload.split_document()
-        print("fill db")
+        self.progress.emit(50)
         self.rag_upload.fill_db()
-        print("emit")
+        self.progress.emit(75)
         self.finished.emit()
+        self.progress.emit(100)
+
+
+class Files_list2remove(QDialog):
+    def __init__(self, items, title="éléments à supprimer", parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(title)
         
+        # 1. Mise en page principale
+        self.layout = QVBoxLayout(self)
+        self.checkboxes = []
+
+        # 2. Création des cases à cocher à partir de la liste
+        for item in items:
+            cb = QCheckBox(item)
+            self.layout.addWidget(cb)
+            self.checkboxes.append(cb)
+
+        # 3. Ajout des boutons OK / Annuler
+        self.buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        )
+        self.buttons.accepted.connect(self.accept) # Ferme et renvoie True
+        self.buttons.rejected.connect(self.reject) # Ferme et renvoie False
+        self.layout.addWidget(self.buttons)
+
+    def get_selected(self):
+        """Retourne la liste des textes des cases cochées."""
+        return [cb.text() for cb in self.checkboxes if cb.isChecked()]
+    
+    def get_tokeep(self):
+        return [cb.text() for cb in self.checkboxes if not cb.isChecked()]
+
+
 class GUI_RAG(QMainWindow):
     
 
@@ -95,6 +161,7 @@ class GUI_RAG(QMainWindow):
         self.db = db
         self.embeding_model = embeding_model
 
+
         # création de la page
         self.raw_window = QWidget(self)
         self.resize(500,500) 
@@ -104,6 +171,16 @@ class GUI_RAG(QMainWindow):
 
         self.show_chat()
         self.question_entry()     
+
+        # initialisation de la bar 
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setMaximumWidth(200)
+        self.progress_bar.setVisible(False) 
+        self.statusBar().addPermanentWidget(self.progress_bar)
+
+
+
+        
 
     def question_entry(self):
         # creation d'un box pour contenir l'entree es le boutton pour recup le prompt
@@ -115,19 +192,25 @@ class GUI_RAG(QMainWindow):
         self.prompt_entry.setLineWrapMode(QTextEdit.WidgetWidth)
         self.prompt_entry.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Maximum)
 
-        # creation du boutton envoie du prompt
-        self.start_button = QPushButton("=>")
-        self.start_button.clicked.connect(self.get_prompt)
+        # creation du bouton envoie du prompt
+        self.start_buton = QPushButton("=>")
+        self.start_buton.clicked.connect(self.get_prompt)
         #self.prompt_entry.returnPressed.connect(self.get_prompt)
 
-        # creation du boutton upload data
-        self.upload_button = QPushButton("+")
-        self.upload_button.clicked.connect(self.link_data)
+        # creation du bouton upload data
+        self.upload_buton = QPushButton("+")
+        self.upload_buton.clicked.connect(self.link_data)
+
+        # bouton pour supprimer des element de la bdd 
+        self.remove_buton = QPushButton("-")
+        self.remove_buton.clicked.connect(self.get_data2remove)
+        
 
         # ajout des elements au a la box entry
         self.entry.addWidget(self.prompt_entry) 
-        self.entry.addWidget(self.start_button)
-        self.entry.addWidget(self.upload_button)
+        self.entry.addWidget(self.start_buton)
+        self.entry.addWidget(self.upload_buton)
+        self.entry.addWidget(self.remove_buton)
 
         # ajout de la box dans dans le main
         self.chat_window.addLayout(self.entry)
@@ -222,19 +305,49 @@ class GUI_RAG(QMainWindow):
         )
         logging.info("démarage du thread => UPLOAD")
         #print("path", files_path)
+        # Dans ton __init__ ou ta fonction de lancement
+        # Affichage de la barre
+        self.progress_bar.setValue(0)
+        self.progress_bar.setVisible(True)
+        self.statusBar().showMessage("Importation en cours...")
+
+
         self.thread_upload = QThread(self)
         self.worker_upload = Upload_data(self.db, self.embeding_model , files_path)
         self.worker_upload.moveToThread(self.thread_upload)
+        self.worker_upload.progress.connect(self.progress_bar.setValue)
 
         self.thread_upload.started.connect(self.worker_upload.run)
         
         self.worker_upload.finished.connect(self.thread_upload.quit)
         self.worker_upload.finished.connect(self.worker_upload.deleteLater)
         self.thread_upload.finished.connect(self.thread_upload.deleteLater)
+        self.thread_upload.finished.connect(lambda: self.statusBar().showMessage("Importation finit"))
         self.thread_upload.start()
+
         logging.info("fin du thread => UPLOAD")
         
+    def get_data2remove(self):
+        app = QApplication.instance() or QApplication(sys.argv)
         
+        deletetools = RAG_Delete(self.db)
+        ma_liste = deletetools.get_files_saved()
+
+        # Initialisation et affichage de la pop-up
+        if len(ma_liste) >=1: 
+            dialog = Files_list2remove(ma_liste)
+            
+            if dialog.exec() == QDialog.Accepted:
+                selection = dialog.get_selected()
+                tokeep = dialog.get_tokeep()
+                print("to keep", tokeep)
+                print(f"Éléments cochés : {selection}")
+                deletetools.remove_data(tokeep)    
+            else:
+                print("Action annulée")
+                return []
+        else:
+            QMessageBox.warning(None, "Attention", "BDD vide")
 
 if __name__ == '__main__':
     embm = "nomic-embed-text"
@@ -242,8 +355,8 @@ if __name__ == '__main__':
         model_name=embm,     # ou "mxbai‑embed‑large", ou "chroma/all‑minilm‑l6‑v2‑f32"
         url="http://localhost:11434/api/embeddings",)
 
-    client = chromadb.PersistentClient(path="chroma_db/robia") # robia/isa88 robia2(filtered robia)
-    chroma_collection = client.get_or_create_collection("robia",embedding_function=embedding_model,configuration={
+    client = chromadb.PersistentClient(path="bdd/rag") # robia/isa88 robia2(filtered robia)
+    chroma_collection = client.get_or_create_collection("rag",embedding_function=embedding_model,configuration={
             "hnsw": {
                 "space": "cosine",
             }

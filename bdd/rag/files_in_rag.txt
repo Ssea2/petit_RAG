@@ -1,1 +1,1 @@
-docs/numpy-user.pdf;
+;/home/sseatwo/DATA/Projects/IA/RAG_cours/docs/numpy-user.pdf;/home/sseatwo/DATA/Projects/IA/RAG_cours/docs/numpy-user.pdf;/home/sseatwo/DATA/Projects/IA/RAG_cours/docs/numpy-user.pdf;
