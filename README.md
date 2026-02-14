@@ -44,7 +44,7 @@ avec la liste de fichier a upload (ne marche que sur des pdf pour l'instant)
 
 # comment contribuer 
 
-1/ crée une branche suivant la "convention de nommage" Gitflow
+1/ crée une branche suivant la "convention de nommage" Gitflow           
 2/ suivre les "conventional commit" pour push des changements
 
 # Licence
