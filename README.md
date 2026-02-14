@@ -27,10 +27,12 @@ pip3 install -r requierement.txt
 # utilisation 
 
 lancer [[GUI.py]] puis posez ça question
-pour l'instant il pour upload des documents il faut lancer custom_ragV2_choix_similarity.py
-avec la liste de fichier a upload (ne marche que sur des pdf pour l'instant)
 
-![exemple](docs/images/exemple.png)
++ pour ajouter des documents a la bdd (ne marche que sur des pdf pour l'instant)
+- pour enlever les document de la bdd
+=> pour poser sa question (si les sources ne contiennent pas de lien, il ne c'est pas basez sur les documents fournis)
+
+![exemple](docs/images/exempleV2.png)
 
 
 # todo 
