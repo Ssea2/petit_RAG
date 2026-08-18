@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Upload - RAG Assistant{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h1><i class="fas fa-cloud-upload-alt"></i> Upload de Documents</h1>
+        <p>Ajoutez des fichiers PDF à votre base de connaissances</p>
+    </div>
+    
+    <div class="upload-container">
+        <div class="upload-zone" id="upload-zone">
+            <div class="upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <div class="upload-text">
+                <h3>Glissez-déposez vos fichiers PDF ici</h3>
+                <p>ou <span class="upload-link">cliquez pour sélectionner</span></p>
+            </div>
+            <input type="file" id="file-input" multiple accept=".pdf" hidden>
+            <div class="upload-info">
+                <i class="fas fa-info-circle"></i>
+                Fichiers PDF uniquement - Taille max: 100MB
+            </div>
+        </div>
+        
+        <div class="uploaded-files" id="uploaded-files" style="display: none;">
+            <h3><i class="fas fa-list"></i> Fichiers sélectionnés</h3>
+            <div class="files-list" id="files-list"></div>
+            <button class="btn btn-primary btn-upload" id="btn-upload">
+                <i class="fas fa-upload"></i>
+                Lancer l'upload
+            </button>
+        </div>
+        
+        <div class="upload-progress" id="upload-progress" style="display: none;">
+            <div class="progress-header">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Upload et indexation en cours...</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-status" id="progress-status">Préparation...</div>
+        </div>
+        
+        <div class="upload-success" id="upload-success" style="display: none;">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>Upload réussi !</h3>
+            <p>Vos documents sont en cours d'indexation et seront disponibles dans quelques instants.</p>
+            <div class="success-actions">
+                <a href="{{ url_for('documents_page') }}" class="btn btn-secondary">
+                    <i class="fas fa-file-alt"></i>
+                    Voir les documents
+                </a>
+                <button class="btn btn-primary" onclick="location.reload()">
+                    <i class="fas fa-plus"></i>
+                    Ajouter d'autres fichiers
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const uploadZone = document.getElementById('upload-zone');
+    const fileInput = document.getElementById('file-input');
+    const uploadedFiles = document.getElementById('uploaded-files');
+    const filesList = document.getElementById('files-list');
+    const btnUpload = document.getElementById('btn-upload');
+    const uploadProgress = document.getElementById('upload-progress');
+    const uploadSuccess = document.getElementById('upload-success');
+    
+    let selectedFiles = [];
+    
+    // Clic sur la zone d'upload
+    uploadZone.addEventListener('click', () => fileInput.click());
+    
+    // Sélection de fichiers
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+    
+    // Drag & drop
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+    
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+    });
+    
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+    });
+    
+    function handleFiles(files) {
+        selectedFiles = Array.from(files).filter(f => f.type === 'application/pdf');
+        
+        if (selectedFiles.length === 0) {
+            alert('Veuillez sélectionner uniquement des fichiers PDF');
+            return;
+        }
+        
+        // Afficher la liste des fichiers
+        filesList.innerHTML = selectedFiles.map(file => `
+            <div class="file-item">
+                <div class="file-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${formatFileSize(file.size)}</div>
+                </div>
+                <button class="file-remove" onclick="removeFile('${file.name}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join('');
+        
+        uploadedFiles.style.display = 'block';
+    }
+    
+    function removeFile(filename) {
+        selectedFiles = selectedFiles.filter(f => f.name !== filename);
+        
+        if (selectedFiles.length === 0) {
+            uploadedFiles.style.display = 'none';
+        } else {
+            handleFiles(selectedFiles);
+        }
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Upload
+    btnUpload.addEventListener('click', async () => {
+        if (selectedFiles.length === 0) return;
+        
+        const formData = new FormData();
+        selectedFiles.forEach(file => {
+            formData.append('files', file);
+        });
+        
+        uploadedFiles.style.display = 'none';
+        uploadProgress.style.display = 'block';
+        
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                uploadProgress.style.display = 'none';
+                uploadSuccess.style.display = 'block';
+                updateStats();
+            } else {
+                throw new Error(data.error || 'Erreur lors de l\'upload');
+            }
+        } catch (error) {
+            alert('Erreur: ' + error.message);
+            uploadProgress.style.display = 'none';
+            uploadedFiles.style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

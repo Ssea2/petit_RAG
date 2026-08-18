@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Documents - RAG Assistant{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h1><i class="fas fa-file-alt"></i> Gestion des Documents</h1>
+        <p>Visualisez et gérez vos documents indexés</p>
+    </div>
+    
+    <div class="documents-stats">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-file-pdf"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value" id="stat-docs">{{ documents|length }}</span>
+                <span class="stat-label">Documents</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-cubes"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value" id="stat-chunks">-</span>
+                <span class="stat-label">Chunks indexés</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="documents-container">
+        {% if documents %}
+        <div class="documents-toolbar">
+            <div class="toolbar-left">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="select-all">
+                    <span class="checkmark"></span>
+                    Tout sélectionner
+                </label>
+            </div>
+            <div class="toolbar-right">
+                <button class="btn btn-danger" id="btn-delete" disabled onclick="deleteSelected()">
+                    <i class="fas fa-trash"></i>
+                    Supprimer la sélection
+                </button>
+            </div>
+        </div>
+        
+        <div class="documents-list" id="documents-list">
+            {% for doc in documents %}
+            <div class="document-item" data-path="{{ doc }}">
+                <label class="checkbox-container">
+                    <input type="checkbox" class="doc-checkbox" value="{{ doc }}">
+                    <span class="checkmark"></span>
+                </label>
+                <div class="document-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="document-info">
+                    <div class="document-name">{{ doc.split('/')[-1].split('\\')[-1] }}</div>
+                    <div class="document-path">{{ doc }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h3>Aucun document</h3>
+            <p>Votre base de connaissances est vide. Commencez par uploader des documents PDF.</p>
+            <a href="{{ url_for('upload_page') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Ajouter des documents
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de confirmation -->
+<div class="modal" id="delete-modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle"></i> Confirmation</h3>
+        </div>
+        <div class="modal-body">
+            <p>Êtes-vous sûr de vouloir supprimer <strong id="delete-count">0</strong> document(s) ?</p>
+            <p class="modal-warning">Cette action est irréversible.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+            <button class="btn btn-danger" id="confirm-delete" onclick="confirmDelete()">
+                <i class="fas fa-trash"></i>
+                Supprimer
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.doc-checkbox');
+    const btnDelete = document.getElementById('btn-delete');
+    const deleteModal = document.getElementById('delete-modal');
+    let filesToDelete = [];
+    
+    // Charger les stats
+    async function loadStats() {
+        try {
+            const response = await fetch('/api/stats');
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById('stat-chunks').textContent = data.total_chunks;
+            }
+        } catch (e) {
+            console.error('Erreur stats:', e);
+        }
+    }
+    loadStats();
+    
+    // Sélectionner tout
+    selectAll?.addEventListener('change', (e) => {
+        checkboxes.forEach(cb => {
+            cb.checked = e.target.checked;
+        });
+        updateDeleteButton();
+    });
+    
+    // Mise à jour du bouton supprimer
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateDeleteButton);
+    });
+    
+    function updateDeleteButton() {
+        const checked = document.querySelectorAll('.doc-checkbox:checked');
+        btnDelete.disabled = checked.length === 0;
+    }
+    
+    function deleteSelected() {
+        const checked = document.querySelectorAll('.doc-checkbox:checked');
+        filesToDelete = Array.from(checked).map(cb => cb.value);
+        
+        document.getElementById('delete-count').textContent = filesToDelete.length;
+        deleteModal.style.display = 'flex';
+    }
+    
+    function closeModal() {
+        deleteModal.style.display = 'none';
+    }
+    
+    async function confirmDelete() {
+        if (filesToDelete.length === 0) return;
+        
+        try {
+            const response = await fetch('/api/documents/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ files: filesToDelete })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Recharger la page
+                location.reload();
+            } else {
+                alert('Erreur: ' + data.error);
+            }
+        } catch (error) {
+            alert('Erreur de connexion: ' + error.message);
+        }
+        
+        closeModal();
+    }
+    
+    // Fermer le modal en cliquant à l'extérieur
+    deleteModal?.addEventListener('click', (e) => {
+        if (e.target === deleteModal) {
+            closeModal();
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RAG Assistant{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>RAG Assistant</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('index') }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+                    <i class="fas fa-comments"></i>
+                    <span>Chat</span>
+                </a>
+                <a href="{{ url_for('upload_page') }}" class="nav-item {% if request.endpoint == 'upload_page' %}active{% endif %}">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Upload</span>
+                </a>
+                <a href="{{ url_for('documents_page') }}" class="nav-item {% if request.endpoint == 'documents_page' %}active{% endif %}">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Documents</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="stats">
+                    <div class="stat-item">
+                        <i class="fas fa-database"></i>
+                        <span id="stats-docs">0 docs</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-cubes"></i>
+                        <span id="stats-chunks">0 chunks</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    {% block extra_js %}{% endblock %}
+    <script>
+        // Mise à jour des statistiques
+        async function updateStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('stats-docs').textContent = data.total_documents + ' docs';
+                    document.getElementById('stats-chunks').textContent = data.total_chunks + ' chunks';
+                }
+            } catch (e) {
+                console.error('Erreur stats:', e);
+            }
+        }
+        updateStats();
+    </script>
+</body>
+</html>

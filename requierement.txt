@@ -7,3 +7,5 @@ chromadb
 langchain-community
 pymupdf
 tqdm
+flask>=2.3.0
+werkzeug>=2.3.0

@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Chat - RAG Assistant{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <!-- Messages Area -->
+    <div class="chat-messages" id="chat-messages">
+        <div class="welcome-message">
+            <div class="welcome-icon">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h1>Bienvenue sur RAG Assistant</h1>
+            <p>Posez vos questions sur vos documents. L'IA répondra en se basant sur le contenu de vos fichiers uploadés.</p>
+            <div class="welcome-tips">
+                <div class="tip">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Utilisez la page <strong>Upload</strong> pour ajouter des PDF</span>
+                </div>
+                <div class="tip">
+                    <i class="fas fa-search"></i>
+                    <span>L'IA recherche automatiquement dans vos documents</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Input Area -->
+    <div class="chat-input-container">
+        <div class="input-wrapper">
+            <textarea 
+                id="message-input" 
+                placeholder="Posez votre question ici..."
+                rows="1"
+            ></textarea>
+            <button id="send-btn" class="send-btn" disabled>
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+        <div class="input-footer">
+            <span class="model-info">
+                <i class="fas fa-microchip"></i>
+                qwen3:0.6b
+            </span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Génération d'un ID de session unique
+    const sessionId = 'session_' + Date.now();
+    const chatMessages = document.getElementById('chat-messages');
+    const messageInput = document.getElementById('message-input');
+    const sendBtn = document.getElementById('send-btn');
+    
+    // Auto-resize textarea
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+        sendBtn.disabled = this.value.trim() === '';
+    });
+    
+    // Envoi avec Entrée (Shift+Entrée pour nouvelle ligne)
+    messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (!sendBtn.disabled) {
+                sendMessage();
+            }
+        }
+    });
+    
+    sendBtn.addEventListener('click', sendMessage);
+    
+    function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+        
+        // Afficher le message utilisateur
+        addMessage(message, 'user');
+        
+        // Réinitialiser l'input
+        messageInput.value = '';
+        messageInput.style.height = 'auto';
+        sendBtn.disabled = true;
+        
+        // Afficher l'indicateur de chargement
+        const loadingId = addLoadingMessage();
+        
+        // Envoyer la requête
+        fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: message,
+                session_id: sessionId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            removeLoadingMessage(loadingId);
+            if (data.success) {
+                addMessage(data.response, 'assistant', data.sources);
+            } else {
+                addMessage('Erreur: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            removeLoadingMessage(loadingId);
+            addMessage('Erreur de connexion: ' + error.message, 'error');
+        });
+    }
+    
+    function addMessage(content, type, sources = []) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        if (type === 'user') {
+            avatar.innerHTML = '<i class="fas fa-user"></i>';
+        } else if (type === 'assistant') {
+            avatar.innerHTML = '<i class="fas fa-robot"></i>';
+        } else {
+            avatar.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+        }
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        
+        // Conversion des sauts de ligne en HTML
+        const textDiv = document.createElement('div');
+        textDiv.className = 'message-text';
+        textDiv.innerHTML = formatMessage(content);
+        contentDiv.appendChild(textDiv);
+        
+        // Ajout des sources si présentes
+        if (sources && sources.length > 0) {
+            const sourcesDiv = document.createElement('div');
+            sourcesDiv.className = 'message-sources';
+            sourcesDiv.innerHTML = `
+                <div class="sources-title">
+                    <i class="fas fa-book-open"></i>
+                    Sources (${sources.length})
+                </div>
+                <div class="sources-list">
+                    ${sources.map(s => `<span class="source-tag">${extractFilename(s)}</span>`).join('')}
+                </div>
+            `;
+            contentDiv.appendChild(sourcesDiv);
+        }
+        
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'message-time';
+        timeDiv.textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        contentDiv.appendChild(timeDiv);
+        
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(contentDiv);
+        
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+    }
+    
+    function addLoadingMessage() {
+        const id = 'loading-' + Date.now();
+        const messageDiv = document.createElement('div');
+        messageDiv.id = id;
+        messageDiv.className = 'message assistant loading';
+        messageDiv.innerHTML = `
+            <div class="message-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="message-content">
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+        return id;
+    }
+    
+    function removeLoadingMessage(id) {
+        const loading = document.getElementById(id);
+        if (loading) {
+            loading.remove();
+        }
+    }
+    
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function extractFilename(path) {
+        return path.split('/').pop().split('\\').pop();
+    }
+    
+    function formatMessage(text) {
+        // Échapper le HTML
+        text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        
+        // Convertir les URLs en liens
+        text = text.replace(
+            /(https?:\/\/[^\s]+)/g, 
+            '<a href="$1" target="_blank" rel="noopener">$1</a>'
+        );
+        
+        // Convertir les sauts de ligne
+        text = text.replace(/\n/g, '<br>');
+        
+        // Mettre en gras le texte entre **
+        text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        
+        // Mettre en italique le texte entre *
+        text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+        
+        return text;
+    }
+</script>
+{% endblock %}
