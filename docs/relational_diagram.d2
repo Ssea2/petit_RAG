@@ -1,0 +1,86 @@
+vars: {
+	d2-config: {
+	layout-engine: tala
+	}
+}
+Apps : Petit_rag {
+	direction: right
+	Backend: {
+		grid-rows: 2
+		grid-columns: 2 
+
+		bdd_manager: {
+			retrieval
+			add_documents
+			delete_documents
+			}
+		controller: serializer/deserializer
+		slm_manager: {
+			prompt_anwser
+			}
+	}
+
+	Frontend: {
+		chat_interface
+		Buttons: {
+			grid-rows: 3
+			send_prompt
+			add_documents
+			delete_documents
+		}
+	}
+	direction: right
+	# Connection
+	## send_prompte 
+	Frontend.Buttons.send_prompt -> Backend.controller: GET /anwser {
+	style {
+		stroke: red 
+		stroke-width: 4
+	
+	}
+	}
+	Backend.controller -> Backend.bdd_manager.retrieval -> Backend.slm_manager.prompt_anwser -> Backend.controller -> Frontend.chat_interface:{
+	style {
+		stroke: red 
+		stroke-width: 4
+	
+	}
+	}
+	
+	## add_documents
+	Frontend.Buttons.add_documents -> Backend.controller: POST /bdd/docs {
+	style {
+		stroke: green
+		stroke-width: 4
+		}
+	}
+
+
+	Backend.controller -> Backend.bdd_manager.add_documents : {
+	style {
+		stroke: green
+		stroke-width: 4
+		}
+	}
+
+	## delete_documents
+	Frontend.Buttons.delete_documents -> Backend.controller: DELETE /bdd/docs  {
+	style {
+		stroke: blue
+		stroke-width: 4
+		}
+	}
+
+	Backend.controller-> Backend.bdd_manager.delete_documents: {
+	style {
+		stroke: blue
+		stroke-width: 4
+		}
+	}
+
+
+
+
+
+
+}
