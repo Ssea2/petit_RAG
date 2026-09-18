@@ -3,3 +3,4 @@ config/config.json
 old
 __pycache__
 .venv
+.env

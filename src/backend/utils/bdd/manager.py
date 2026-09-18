@@ -8,13 +8,12 @@ from .utils.embedder import EmbedManager
 class bdd_manager:
 
     def __init__(self, config) -> None:
-        # parameters
         self._config = config["bdd_manager"]
         self.bdd_url =self._config["bdd_path"]
         self.chunk_size = self._config["parser"]["chunk_size"]
-        self.embedding_model = self._config["embedding_model"]
+        self.embedding_model = self._config["embedding_model"]["name"]
+        self.max_retrieval = self._config["max_retrieval"]
 
-        # initialisation
         self.parser = DocumentsParser(self.chunk_size)
         self.embed = EmbedManager(self.embedding_model)
         self._bdd_connection()
@@ -34,6 +33,7 @@ class bdd_manager:
             self.table = self.bdd.open_table(table_name)
         else:
             self.table = self.bdd.create_table(table_name, schema=DataBaseRows, mode="overwrite")
+            
         return None
 
     def _multifile_parser(self, filesnames: list[str]) -> list[ParserMessage]:
@@ -63,3 +63,20 @@ class bdd_manager:
         self.table.add(
             data=[row.model_dump() for row in rows]
         )
+        self.table.create_index(
+                vector_column_name="embedding",
+                index_type="IVF_HNSW_SQ"
+            )
+
+    def retrieval(self, prompt):
+        message = ParserMessage(
+                filename="None",
+                chunk=[prompt]
+        )
+        if self.table.count_rows() > 0:
+            results = self.table.search(
+                query=self.embed.embed(message).embeddings
+            ).limit(self.max_retrieval).select(["filename", "chunk"]).to_list()
+            return results
+        else:
+            return None

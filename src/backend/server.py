@@ -12,7 +12,8 @@ from utils.config_loader import API_config
 config = API_config()
 
 
-bdd_manager(config=config).add_documents(["requirements.txt"])
-
+bdd = bdd_manager(config=config)
+bdd.add_documents(["requirements.txt"])
+print(bdd.retrieval("uvicorn"))
 
 
