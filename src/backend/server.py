@@ -1,5 +1,6 @@
 import fastapi
 from fastapi.routing import APIRoute
+from numpy import delete
 import uvicorn
 
 from dotenv import load_dotenv
@@ -15,5 +16,6 @@ config = API_config()
 bdd = bdd_manager(config=config)
 bdd.add_documents(["requirements.txt"])
 print(bdd.retrieval("uvicorn"))
+bdd.delete_documents(documents=["requirements.txt"])
 
 

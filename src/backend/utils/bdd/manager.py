@@ -1,4 +1,5 @@
 import lancedb
+from numpy import delete
 import ollama
 
 from .utils.parser import DocumentsParser
@@ -60,13 +61,18 @@ class bdd_manager:
         parsed_documents = self._multifile_parser(documents)
         embedded_documents = self._multifile_embedding(parsed_documents)
         rows = self._rows_making(embedded_documents)
+        table_size = self.table.count_rows()
         self.table.add(
             data=[row.model_dump() for row in rows]
         )
-        self.table.create_index(
+        if table_size == 0:
+            self.table.create_index(
                 vector_column_name="embedding",
                 index_type="IVF_HNSW_SQ"
             )
+        else:
+            self.table.optimize()
+
 
     def retrieval(self, prompt):
         message = ParserMessage(
@@ -80,3 +86,9 @@ class bdd_manager:
             return results
         else:
             return None
+
+    def delete_documents(self, documents: list):
+        request_documents = ' '.join("'" + document +"'" for document in documents)
+        self.table.delete(f"filename IN ({request_documents})")
+        if self.table.count_rows() > 0:
+            self.table.optimize()
