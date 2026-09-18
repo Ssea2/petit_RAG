@@ -1,10 +1,18 @@
 import fastapi
+from fastapi.routing import APIRoute
 import uvicorn
 
-from utils.bdd.utils.parser import DocumentParser
+from dotenv import load_dotenv
 
-t = DocumentParser(chunk_size=2)
-print(t.parse("requirements.txt"))
+load_dotenv()
+
+from utils.bdd.manager import bdd_manager
+from utils.config_loader import API_config
+
+config = API_config()
+
+
+bdd_manager(config=config).add_documents(["requirements.txt"])
 
 
 

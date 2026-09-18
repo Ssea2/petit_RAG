@@ -1,23 +1,24 @@
 import lancedb
 import ollama
 
-from config_loader.loader import API_config
-from utils.parser import DocumentsParser
-from utils.embed import EmbedManager
+from .utils.parser import DocumentsParser
+from .utils.models import ParserMessage, EmbeddingMessage, DataBaseRows
+from .utils.embedder import EmbedManager
 
 class bdd_manager:
 
-    def __init__(self) -> None:
+    def __init__(self, config) -> None:
         # parameters
-        self._config = API_config()["bdd_manager"]
+        self._config = config["bdd_manager"]
         self.bdd_url =self._config["bdd_path"]
-        self.chunk_size = self._config["chunk_size"]
+        self.chunk_size = self._config["parser"]["chunk_size"]
         self.embedding_model = self._config["embedding_model"]
 
         # initialisation
         self.parser = DocumentsParser(self.chunk_size)
-        self.embed = EmbedManager()
+        self.embed = EmbedManager(self.embedding_model)
         self._bdd_connection()
+        self.set_table("defaull")
         return None
 
     def _bdd_connection(self) -> None:
@@ -32,15 +33,33 @@ class bdd_manager:
         if table_name is self.bdd.list_tables():
             self.table = self.bdd.open_table(table_name)
         else:
-            self.table = self.bdd.create_table(table_name)
+            self.table = self.bdd.create_table(table_name, schema=DataBaseRows, mode="overwrite")
         return None
 
-    def _parsing(self, documents : list[str]):
-        return {document: self.parser.parse(document) for document in documents}
+    def _multifile_parser(self, filesnames: list[str]) -> list[ParserMessage]:
+        return [self.parser.parse(file) for file in filesnames]
 
-    def _embedding(self, data):
-        pass
+    def _multifile_embedding(self, files_datas) -> list[EmbeddingMessage]:
+        return [self.embed.embed(data) for data in files_datas]
 
+    def _rows_making(self, datas: list[EmbeddingMessage]) -> list[DataBaseRows]:
+        rows = []
+        for message in datas:
+            for idx in range(message.chunk_numer):
+                rows.append(
+                    DataBaseRows(
+                        embedding=message.embeddings[idx],
+                        chunk=message.chunk[idx],
+                        filename=message.filename,
+                        filepart=idx
+                    )
+                )
+        return rows
 
     def add_documents(self, documents: list[str]):
-        parsed_documents = 
+        parsed_documents = self._multifile_parser(documents)
+        embedded_documents = self._multifile_embedding(parsed_documents)
+        rows = self._rows_making(embedded_documents)
+        self.table.add(
+            data=[row.model_dump() for row in rows]
+        )

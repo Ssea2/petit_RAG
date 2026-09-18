@@ -1,5 +1,5 @@
 import os
-from models import ParserMessage
+from .models import ParserMessage
 
 class DocumentsParser:
 
@@ -22,10 +22,10 @@ class DocumentsParser:
     def _str_parser(self, filename: str) -> ParserMessage:
         with open(filename, "r") as opened_filename:
             data = opened_filename.read()
-        return ParserMessage(file_name=filename, chunk=self._parser(data))
+        return ParserMessage(filename=filename, chunk=self._parser(data))
 
     def _pdf_parser(self, filename: str) -> ParserMessage:
-        return ParserMessage(file_name=filename, chunk=["a"])
+        return ParserMessage(filename=filename, chunk=["a"])
 
 
     def _parser(self, file_data: str) -> list[str]:
