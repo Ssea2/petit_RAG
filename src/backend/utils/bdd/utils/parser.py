@@ -1,4 +1,4 @@
-import os
+import pathlib
 from .models import ParserMessage
 
 class DocumentsParser:
@@ -8,7 +8,7 @@ class DocumentsParser:
         self.chunk_size = chunk_size
 
     def parse(self, filename: str) -> ParserMessage:
-        _, extension_ = os.path.splitext(filename)
+        extension_ = pathlib.Path(filename).suffix
         match extension_:
             case ".txt" | ".sh" | ".bash" | ".md":
                 return self._str_parser(filename)

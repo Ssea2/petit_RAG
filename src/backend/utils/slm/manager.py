@@ -1,65 +1,57 @@
+import ollama
 
-class RAG_Answer():
+class slm_manager:
 
-    def __init__(self, db, llm="qwen3:0.6b-q4_K_M", top_n_result: int = 15):
-        
-        self.llm = llm
-        self.db  = db
-        self.n_result = top_n_result
-        self.results = []
-        self.files_sources = []
-        self.textdata = []
-        self.instruction_prompt = "Tu est un chatbot utile, si il y a du contexte entre les banieres <CONTEXTE> répond a la question présent dans les banieres <QUESTION> "
+    def __init__(self, config) -> None:
+        self.config_ = config["slm_manager"]
+        self.model = self.config_["model"]
+        self.conversation = [
+            {
+                "role": "system",
+                "content": self.config_["objective"]
+            }
+        ]
+        self.available_models = self._get_available_models()
+        self._check_model_availability()
 
-
-    def get_input_prompt(self, input_query, history):
-        self.prompt = str(history)+","+input_query
-
-    def similarity_search(self, threshold=0.3):
-        self.files_sources = []
-        self.textdata = []
-        self.results = self.db.query(
-        query_texts=[self.prompt], # Chroma will embed this for you
-        n_results=self.n_result # how many results to return
-        )
-        #print(self.results)
-        len_result = len(self.results['ids'][0])
-        for i in range(len_result):
-            if self.results["distances"][0][i] < threshold:
-                pass 
-            else:
-                self.files_sources.append(self.results["metadatas"][0][i]["file_path"])
-                self.textdata.append(self.results["documents"])
-        self.files_sources = list(set(self.files_sources))
+    def _get_available_models(self) -> list[str]:
+        return [model.model for model in list(ollama.list())[0][1]]
 
 
-        
+    def _check_model_availability(self) -> None:
+        if not self.model in self.available_models:
+            ollama.pull(self.model)
+        return None
 
-    def update_prompt(self):
-        self.enchanced_prompt = f'''Tu est un chatbot utile, 
-        si il y a du contexte entre les bannieres <CONTEXTE> répond a la question présent dans les bannieres <QUESTION> 
-        de maninère a répondre au mieux avec le plus de détails. Si il y a des url tu les met sous la forme <a href="url" style="text-decoration:none; color:blue;">"url"</a>' 
-    
-        <QUESTION> {self.prompt} <QUESTION>
-        <CONTEXTE> {self.textdata} <CONTEXTE>'''
-        #print(self.enchanced_prompt)
-        
-    def rag_prompt(self):
+    def prompt_upgrade(self, prompt: str, documents: list[dict]):
+        documents_data = []
+        sources = []
+        for document in documents:
+            documents_data.append(document["chunk"])
+            sources.append(document["filename"])
+        upgraded_prompt = f"<QUESTION> : {prompt} \n <SOURCES> : {documents_data}"
+        return {"prompt": upgraded_prompt, "sources": list((sources))}
+
+    def generate(self, prompt: str, documents: list[dict]):
+        message = self.prompt_upgrade(prompt=prompt, documents=documents)
+        print("MESSAGE:", message)
+        self.conversation.append({
+            "role": "user",
+            "content": message["prompt"]
+        })
+
         stream = ollama.chat(
-        model=self.llm,
-        messages=[
-        {'role': 'system', 'content': self.instruction_prompt},
-        {'role': 'user', 'content': self.enchanced_prompt},
-        ],
-        stream=True,
+            model = self.model,
+            messages = self.conversation,
+            stream=True,
         )
-        return stream, self.files_sources
+        anwser = " ".join(chunk["message"]["content"] for chunk in stream)
 
-    def rag_stack(self, input, hist: list = []):
-        self.get_input_prompt(input, hist)
-        self.similarity_search()
-        self.update_prompt()
-        stream, files = self.rag_prompt()
-        return stream, files
-
+        self.conversation.append(
+            {
+            "role": "assistant",
+            "content": " ".join(chunk["message"]["content"] for chunk in stream)
+            }
+        )
+        return anwser, message["sources"]
 

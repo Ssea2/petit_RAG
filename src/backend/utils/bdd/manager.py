@@ -40,7 +40,7 @@ class bdd_manager:
     def _multifile_parser(self, filesnames: list[str]) -> list[ParserMessage]:
         return [self.parser.parse(file) for file in filesnames]
 
-    def _multifile_embedding(self, files_datas) -> list[EmbeddingMessage]:
+    def _multifile_embedding(self, files_datas: list[ParserMessage]) -> list[EmbeddingMessage]:
         return [self.embed.embed(data) for data in files_datas]
 
     def _rows_making(self, datas: list[EmbeddingMessage]) -> list[DataBaseRows]:
@@ -57,7 +57,7 @@ class bdd_manager:
                 )
         return rows
 
-    def add_documents(self, documents: list[str]):
+    def add_documents(self, documents: list[str]) -> None:
         parsed_documents = self._multifile_parser(documents)
         embedded_documents = self._multifile_embedding(parsed_documents)
         rows = self._rows_making(embedded_documents)
@@ -72,9 +72,10 @@ class bdd_manager:
             )
         else:
             self.table.optimize()
+        return None
 
 
-    def retrieval(self, prompt):
+    def retrieval(self, prompt: str) -> list:
         message = ParserMessage(
                 filename="None",
                 chunk=[prompt]
@@ -83,12 +84,13 @@ class bdd_manager:
             results = self.table.search(
                 query=self.embed.embed(message).embeddings
             ).limit(self.max_retrieval).select(["filename", "chunk"]).to_list()
-            return results
         else:
-            return None
+            results = []
+        return results
 
-    def delete_documents(self, documents: list):
+    def delete_documents(self, documents: list) -> None:
         request_documents = ' '.join("'" + document +"'" for document in documents)
         self.table.delete(f"filename IN ({request_documents})")
         if self.table.count_rows() > 0:
             self.table.optimize()
+        return None

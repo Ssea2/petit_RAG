@@ -14,9 +14,7 @@ class EmbedManager:
     def _check_model_availability(self) -> None:
         if not self.embedding_model in self.available_models:
             ollama.pull(self.embedding_model)
-            return None
-        else:
-            return None
+        return None
 
     def embed(self, data: ParserMessage) -> EmbeddingMessage:
         embeddings = ollama.embed(
