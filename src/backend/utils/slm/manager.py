@@ -23,21 +23,11 @@ class slm_manager:
             ollama.pull(self.model)
         return None
 
-    def prompt_upgrade(self, prompt: str, documents: list[dict]):
-        documents_data = []
-        sources = []
-        for document in documents:
-            documents_data.append(document["chunk"])
-            sources.append(document["filename"])
-        upgraded_prompt = f"<QUESTION> : {prompt} \n <SOURCES> : {documents_data}"
-        return {"prompt": upgraded_prompt, "sources": list((sources))}
-
-    def generate(self, prompt: str, documents: list[dict]):
-        message = self.prompt_upgrade(prompt=prompt, documents=documents)
-        print("MESSAGE:", message)
+    def generate(self, prompt: str):
+        print("MESSAGE:", prompt)
         self.conversation.append({
             "role": "user",
-            "content": message["prompt"]
+            "content": prompt
         })
 
         stream = ollama.chat(

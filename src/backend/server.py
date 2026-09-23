@@ -10,7 +10,6 @@ bdd = bdd_manager(config=config)
 slm = slm_manager(config=config)
 app = FastAPI()
 
-
 @app.post("/small_language_model/question", response_model=RagAwnser)
 def slm_anwser(prompt: Prompt):
     informations = bdd.retrieval(prompt.question)
@@ -26,4 +25,3 @@ def bdd_upload(documents: Documents):
 def bdd_remove(documents: Documents):
     bdd.delete_documents(documents.names)
     return OKresponces()
-

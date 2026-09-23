@@ -20,6 +20,8 @@ Apps : Petit_rag {
 			}
 	}
 
+	Ollama
+
 	Frontend: {
 		chat_interface
 		Buttons: {
@@ -39,7 +41,7 @@ Apps : Petit_rag {
 	
 	}
 	}
-	Backend.controller -> Backend.bdd_manager.retrieval -> Backend.slm_manager.prompt_anwser -> Backend.controller -> Frontend.chat_interface:{
+	Backend.controller -> Backend.bdd_manager.retrieval -> Backend.slm_manager.prompt_anwser -> Ollama -> Backend.slm_manager.prompt_anwser -> Backend.controller -> Frontend.chat_interface:{
 	style {
 		stroke: red 
 		stroke-width: 4
