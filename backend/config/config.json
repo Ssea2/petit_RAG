@@ -1,0 +1,10 @@
+{
+"bdd":{
+	"path": "backend/data/text.db",
+    "default_table": "embedding",
+    "embedding": {
+        "size": 3,
+    },
+    "retrieval_limits": 1,
+}
+

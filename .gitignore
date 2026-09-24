@@ -1,6 +1,3 @@
-data
-config/config.json
-old
+venv
 __pycache__
-.venv
-.env
+data
