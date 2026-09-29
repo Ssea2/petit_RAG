@@ -20,8 +20,8 @@ https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF
 
 ## TODO
 
-- [ ] Fastapi base (i.e endpoints pydantic models).
-- [ ] Web interface (prompt form, add/delete file buttons) in html/css/js.
+- [X] Fastapi base (i.e endpoints pydantic models).
+- [-] Web interface (prompt form, add/delete file buttons) in html/css/js.
 - [X] Files parser (txt/md, pdf) in python
 - [X] Database collection with sqlite3 + sqlite_vec
 - [ ] Language Model anwser generation with python llama_cpp
