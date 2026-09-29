@@ -63,3 +63,7 @@ body {
 .user {
 	background-color: lightgreen;
 }
+
+.files-selector {
+	display: none;
+}

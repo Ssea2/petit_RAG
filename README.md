@@ -8,10 +8,20 @@ When there is a prompt we get the chunks index and the file needed and we retrie
 if there is padding an algorithme will make the union of the index to reduce redonancy.
 for exemple if we have chunk_1 (first index = 0, length 512) and chunk_2 (first index = 256, length 512) we will only get a chunk from index 0 to 768
 
-# TODO
+## Models
+
+### Embedding
+
+https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF
+
+### Language model
+
+https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF
+
+## TODO
 
 - [ ] Fastapi base (i.e endpoints pydantic models).
 - [ ] Web interface (prompt form, add/delete file buttons) in html/css/js.
-- [ ] Files parser (txt/md, pdf) in python
-- [ ] Database collection with sqlite3 + sqlite_vec
+- [X] Files parser (txt/md, pdf) in python
+- [X] Database collection with sqlite3 + sqlite_vec
 - [ ] Language Model anwser generation with python llama_cpp

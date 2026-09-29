@@ -1,6 +1,8 @@
-fastapi[standard]==0.141.1
+--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
+fastapi==0.141.1
 uvicorn==0.53.0
 sqlite_vec==0.1.9
 llama-cpp-python==0.3.35
 pydantic==2.13.5
 pymupdf4llm==1.28.2
+python-multipart== 0.0.32

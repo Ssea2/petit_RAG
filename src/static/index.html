@@ -3,6 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>Petit Rag </title>
+	<link rel="icon" href="data:,">
 	<link rel="stylesheet" href="./style.css">
 	<script src="./scripts.js" defer></script>
 </head>
@@ -17,11 +18,13 @@
 				</textarea>
 				<section class="prompt-form-buttons">
 					<button class="button-prompt-sender">></button>
-					<button class="button-add-documents">+</button>
+					<div>
+						<button class="button-add-documents">+</button>
+						<input class="files-selector"type="file" multiple>
+					</div>
 					<button class="button-delete-documents">-</button>
 				</section>
 			</div>
-
 		</section>
 	</main>
 </body>
