@@ -28,9 +28,9 @@ class DocumentsReader:
         return content
 
     def pdf_reader(self, file:str | bytes) -> str:
-        if isinstance(file, bytes):
-            content = file.decode()
-        elif isinstance(file, str):
+        if isinstance(file, str):
+            content = pymupdf4llm.to_markdown(file)
+        elif isinstance(file, bytes):
             document = pymupdf.open(stream=file, filetype="pdf")
             content = pymupdf4llm.to_markdown(document)
         else:
@@ -70,8 +70,8 @@ class DocumentsReader:
             case _:
                 raise ValueError(f"Bad file extension : {extension}")
 
-    async def read_stream(self, file: UploadFile = File(...)) -> str:
+    async def read_stream(self, file: UploadFile = File(...)) -> tuple[str, str]:
         filename, bytes_content = await self._stream_reader(file)
         content = self.read(filename, bytes_content)
-        return content
+        return content, filename
     

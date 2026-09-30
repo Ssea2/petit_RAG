@@ -12,24 +12,43 @@ function textAreaHeightUpdate() {
 	this.style.height = `${newHeight}px`;
 }
 
-function add2History(prompt) {
-	const htmlMessage = `<p class="message user">${prompt}</p>`;
+
+async function get_rag_anwser(userPrompt) {
+	const response = await fetch('/language_model/question',{
+		method: "POST",
+		headers: {
+        "Content-Type": "application/json"
+		},
+		body: JSON.stringify({prompt: userPrompt})
+	})
+	const results = await response.json();
+	console.log(results);
+}
+
+
+function add2History(userPrompt) {
+	const htmlMessage = `<p class="message user">${userPrompt.replace(/\n/g, "<br>")}</p>`;
 
 	history.insertAdjacentHTML("beforeend", htmlMessage);
 
 	textAreaPrompt.value = '';
 	textAreaPrompt.style.height = "auto";
+	console.log("ha");
+	get_rag_anwser(userPrompt);
+	console.log("response");
 }
 
 function checkCommand() {
-	const prompt = textAreaPrompt.value.replace(/\n/g, "<br>");
-	switch (prompt)	{
+	const userPrompt = textAreaPrompt.value;
+	switch (userPrompt)	{
 		case "/clear":
 			history.replaceChildren();
+			textAreaPrompt.value = "";
+			break;
 		case "":
 			break;
 		default:
-			add2History(prompt);
+			add2History(userPrompt);
 	}
 }
 
@@ -75,3 +94,7 @@ async function fileSelectionSend() {
 }
 
 buttonAddDocuments.addEventListener("click", fileSelectionSend);
+
+
+// RAG 
+

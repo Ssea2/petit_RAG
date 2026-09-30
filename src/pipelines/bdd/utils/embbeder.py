@@ -1,8 +1,7 @@
 from typing import List
 import llama_cpp
 import os
-
-from numpy import float32
+import sqlite_vec
 
 class Embedder:
 
@@ -27,8 +26,13 @@ class Embedder:
             verbose=False
         )
 
-    def embed(self, chunk: list[str]) -> list[list]:
+    def embed(self, chunk: list[str]) -> list[bytes]:
         embeddings = self.embedding_model.create_embedding(
             input=chunk
         )["data"]
-        return [ chunk["embedding"] for chunk in embeddings]
+
+        results = []
+        for embedding in embeddings:
+            vec = embedding["embedding"]
+            results.append(sqlite_vec.serialize_float32(vec))
+        return results

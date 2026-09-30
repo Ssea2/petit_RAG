@@ -1,1 +1,1 @@
-from .rag import rag_pipeline, documents_pipeline
+from .rag import PetitRagCore

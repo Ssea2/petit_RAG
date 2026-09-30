@@ -2,6 +2,7 @@ import sqlite3
 from typing import List, Text
 import sqlite_vec
 
+from .models import ChunkInfo
 
 class VectorDataBase:
 
@@ -19,6 +20,7 @@ class VectorDataBase:
         self.bdd.enable_load_extension(True)
         sqlite_vec.load(self.bdd)
         self.bdd.enable_load_extension(False)
+        self.bdd.row_factory = sqlite3.Row
         self.cursor = self.bdd.cursor()
 
         self.create_table(table=self.table)
@@ -43,21 +45,21 @@ class VectorDataBase:
         self.bdd.close()
 
     def add_document(self, data) -> None:
-        self.cursor.executemany(f"""
-            INSERT INTO {self.table} (embedding, chunkStartIndex, chunkLength, filename) 
-            VALUES (?,?,?,?)
-        """,
-            data
-        )
+        with self.bdd:
+            self.cursor.executemany(f"""
+                INSERT INTO {self.table} (embedding, chunkStartIndex, chunkLength, filename) 
+                VALUES (?,?,?,?)
+            """,
+                data
+            )
 
-    def retrieval(self, vector: list[float]) -> list[tuple[int, int, str]]:
-        serialized_vector: bytes = sqlite_vec.serialize_float32(vector)
+    def retrieval(self, vector: bytes) -> list[ChunkInfo]:
         results = self.cursor.execute(f"""
-            SELECT chunkStartIndex, chunkLength, filename
+            SELECT distance, chunkStartIndex, chunkLength, filename
             FROM {self.table} 
             WHERE embedding MATCH ?
             ORDER BY distance
             LIMIT ?
         """, (vector, self.retrieval_limits)).fetchall()
-        return results
+        return [ChunkInfo(**dict(chunk)) for chunk in results]
 

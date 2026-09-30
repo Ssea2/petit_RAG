@@ -6,7 +6,7 @@ class DocumentsParser:
         self.chunk_size = chunk_size
         self.padding = padding
 
-    def _parser(self, file_data: str, filename: str) -> list[list[str, int, int, str]]:
+    def parse(self, file_data: str, filename: str) -> list[list[bytes | str | int]]:
         file_len = len(file_data)
         data = []
         for idx in range(0, file_len, self.chunk_size - self.padding):
